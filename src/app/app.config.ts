@@ -1,9 +1,19 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { ApplicationConfig } from '@angular/core';
+import { provideRouter, Routes } from '@angular/router';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { LandingPageComponent } from './landing-page/landing-page.component';
 
-import { routes } from './app.routes';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
+const routes: Routes = [
+  { path: '', component: LandingPageComponent }, // Default route
+  { path: 'for-job-seekers', component: LandingPageComponent }, // Placeholder
+  { path: 'for-employers', component: LandingPageComponent }, // Placeholder
+  { path: 'login', component: LandingPageComponent }, // Placeholder
+  { path: 'signup', component: LandingPageComponent }, // Placeholder
+];
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideClientHydration(withEventReplay())]
+  providers: [
+    provideRouter(routes),
+    provideAnimations() // Required for Angular Material animations
+  ]
 };

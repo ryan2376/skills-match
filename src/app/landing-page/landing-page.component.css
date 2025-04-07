@@ -1,0 +1,78 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1e90ff;
+    /* Blue color */
+}
+
+.nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #333;
+}
+
+.nav button {
+    margin-left: 10px;
+}
+
+.hero {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #1e90ff, #32cd32);
+    /* Blue to green gradient */
+    color: white;
+}
+
+.hero h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    font-size: 18px;
+    margin-bottom: 30px;
+}
+
+.hero-buttons button {
+    margin: 0 10px;
+}
+
+.hero-image {
+    max-width: 100%;
+    height: auto;
+    margin-top: 20px;
+}
+
+.features {
+    display: flex;
+    justify-content: space-around;
+    padding: 40px 20px;
+    background-color: #fff;
+}
+
+.feature-card {
+    text-align: center;
+    padding: 20px;
+    width: 30%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.feature-card h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.feature-card p {
+    font-size: 16px;
+    color: #666;
+}
