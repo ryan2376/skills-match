@@ -1,38 +1,4 @@
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 40px;
-    background-color: #fefefe;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    font-size: 24px;
-    font-weight: bold;
-    color: #1e90ff;
-    margin-left: 100px;
-}
-
-.lord-icon {
-    width: 80px;
-    height: 80px;
-    margin-right: 10px;
-    padding: 5px;
-}
-
-.nav a {
-    margin: 0 15px;
-    text-decoration: none;
-    color: #333;
-}
-
-.nav button {
-    margin-left: 10px;
-}
-
+/* src/app/components/landing-page/landing-page.component.css */
 .hero {
     text-align: center;
     padding: 60px 20px;
@@ -84,13 +50,6 @@
 .feature-card p {
     font-size: 16px;
     color: #666;
-}
-
-lord-icon {
-    display: block;
-    margin: 0 auto;
-    /* Center the Lordicon */
-    padding: 20px;
 }
 
 .footer {

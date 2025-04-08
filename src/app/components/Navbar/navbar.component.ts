@@ -1,24 +1,25 @@
+/* src/app/components/navbar/navbar.component.ts */
 import { Component, OnInit, Renderer2, CUSTOM_ELEMENTS_SCHEMA, Inject, PLATFORM_ID } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 @Component({
-  selector: 'app-landing-page',
+  selector: 'app-navbar',
   standalone: true,
   imports: [MatButtonModule, RouterLink, CommonModule],
-  templateUrl: './landing-page.component.html',
-  styleUrls: ['./landing-page.component.css'],
+  templateUrl: './navbar.component.html',
+  styleUrls: ['./navbar.component.css'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class LandingPageComponent implements OnInit {
-  isBrowser: boolean; // Add this property
+export class NavbarComponent implements OnInit {
+  isBrowser: boolean;
 
   constructor(
     private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    this.isBrowser = isPlatformBrowser(this.platformId); // Set the flag
+    this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
   ngOnInit(): void {

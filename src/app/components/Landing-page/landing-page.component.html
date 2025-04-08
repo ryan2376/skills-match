@@ -1,26 +1,12 @@
-<!-- Header -->
-<header class="header">
-    <div class="logo">
-        <lord-icon class="lord-icon" src="https://cdn.lordicon.com/ecngpoqo.json" trigger="hover"
-            colors="primary:#16a9c7,secondary:#1663c7">
-        </lord-icon>SkillMatch
-    </div>
-    <nav class="nav">
-        <a routerLink="/">Home</a>
-        <a routerLink="/for-job-seekers">For Job Seekers</a>
-        <a routerLink="/for-employers">For Employers</a>
-        <button mat-button routerLink="/login">Login</button>
-        <button mat-raised-button color="primary" routerLink="/signup">Sign Up</button>
-    </nav>
-</header>
+<!-- src/app/components/landing-page/landing-page.component.html -->
+<app-navbar></app-navbar>
 
 <!-- Hero Section -->
 <section class="hero">
     <h1>Find Your Perfect Match with Skills, Not Titles</h1>
     <p>AI-powered hiring for job seekers and employers</p>
     <div class="hero-buttons">
-        <button mat-raised-button color="primary" routerLink="/signup?role=job_seeker">Get Started as Job
-            Seeker</button>
+        <button mat-raised-button color="primary" routerLink="/signup?role=job_seeker">Get Started as Job Seeker</button>
         <button mat-raised-button color="accent" routerLink="/signup?role=employer">Hire Now</button>
     </div>
     <img src="/network.png" alt="Hero Illustration" class="hero-image">
@@ -46,13 +32,11 @@
 </section>
 
 <!-- Lordicon Animated Icon (only render in browser) -->
-<ng-container *ngIf="isBrowser">
-
+<ng-container>
 </ng-container>
 
 <!-- Footer -->
 <footer class="footer">
     <p>© 2025 SkillMatch AI. All rights reserved.</p>
-    <p><a href="https://www.flaticon.com/free-icons/network" title="network icons">Network icons created by Kiranshastry
-            - Flaticon</a></p>
+    <p><a href="https://www.flaticon.com/free-icons/network" title="network icons">Network icons created by Kiranshastry - Flaticon</a></p>
 </footer>

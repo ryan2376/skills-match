@@ -1,0 +1,59 @@
+<!-- src/app/components/signup/signup.component.html -->
+<app-navbar></app-navbar>
+
+<!-- Signup Section -->
+<section class="signup-section">
+    <h1>Get Started Now</h1>
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="signup-form">
+        <mat-form-field appearance="outline">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" required>
+            <mat-error *ngIf="signupForm.get('name')?.hasError('required')">Name is required</mat-error>
+            <mat-error *ngIf="signupForm.get('name')?.hasError('minlength')">Name must be at least 2 characters</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" type="email" required>
+            <mat-error *ngIf="signupForm.get('email')?.hasError('required')">Email is required</mat-error>
+            <mat-error *ngIf="signupForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input matInput formControlName="password" type="password" required>
+            <mat-error *ngIf="signupForm.get('password')?.hasError('required')">Password is required</mat-error>
+            <mat-error *ngIf="signupForm.get('password')?.hasError('minlength')">Password must be at least 6 characters</mat-error>
+        </mat-form-field>
+
+        <mat-checkbox formControlName="terms" required>
+            I agree to the <a href="/terms" target="_blank">Terms of Service</a>
+        </mat-checkbox>
+        <mat-error *ngIf="signupForm.get('terms')?.hasError('required') && signupForm.get('terms')?.touched">
+            You must agree to the terms
+        </mat-error>
+
+        <button mat-raised-button color="primary" type="submit" [disabled]="signupForm.invalid">Sign Up</button>
+    </form>
+
+    <!-- Alternative Sign-In Options -->
+    <div class="alternative-signin">
+        <button mat-stroked-button class="google-signin">
+            <img src="/google-icon.png" alt="Google Icon" class="signin-icon"> Sign in with Google
+        </button>
+        <button mat-stroked-button class="apple-signin">
+            <img src="/apple-icon.png" alt="Apple Icon" class="signin-icon"> Sign in with Apple
+        </button>
+    </div>
+
+    <!-- Sign In Link -->
+    <p class="signin-link">
+        Already have an account? <a routerLink="/login">Sign in</a>
+    </p>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>© 2025 SkillMatch AI. All rights reserved.</p>
+    <p><a href="https://www.flaticon.com/free-icons/network" title="network icons">Network icons created by Kiranshastry - Flaticon</a></p>
+</footer>
