@@ -1,6 +1,10 @@
 <!-- Header -->
 <header class="header">
-    <div class="logo">SkillMatch</div>
+    <div class="logo">
+        <lord-icon class="lord-icon" src="https://cdn.lordicon.com/ecngpoqo.json" trigger="hover"
+            colors="primary:#16a9c7,secondary:#1663c7">
+        </lord-icon>SkillMatch
+    </div>
     <nav class="nav">
         <a routerLink="/">Home</a>
         <a routerLink="/for-job-seekers">For Job Seekers</a>
@@ -19,7 +23,7 @@
             Seeker</button>
         <button mat-raised-button color="accent" routerLink="/signup?role=employer">Hire Now</button>
     </div>
-    <img src="assets/hero-illustration.png" alt="Hero Illustration" class="hero-image">
+    <img src="/network.png" alt="Hero Illustration" class="hero-image">
 </section>
 
 <!-- Features Section -->
@@ -40,3 +44,15 @@
         <button mat-button color="primary">Learn More</button>
     </div>
 </section>
+
+<!-- Lordicon Animated Icon (only render in browser) -->
+<ng-container *ngIf="isBrowser">
+
+</ng-container>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>© 2025 SkillMatch AI. All rights reserved.</p>
+    <p><a href="https://www.flaticon.com/free-icons/network" title="network icons">Network icons created by Kiranshastry
+            - Flaticon</a></p>
+</footer>

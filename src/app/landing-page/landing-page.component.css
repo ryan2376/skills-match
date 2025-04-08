@@ -3,15 +3,24 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px 40px;
-    background-color: #f8f9fa;
+    background-color: #fefefe;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
+    display: flex;
+    align-items: center;
     font-size: 24px;
     font-weight: bold;
     color: #1e90ff;
-    /* Blue color */
+    margin-left: 100px;
+}
+
+.lord-icon {
+    width: 80px;
+    height: 80px;
+    margin-right: 10px;
+    padding: 5px;
 }
 
 .nav a {
@@ -28,7 +37,6 @@
     text-align: center;
     padding: 60px 20px;
     background: linear-gradient(135deg, #1e90ff, #32cd32);
-    /* Blue to green gradient */
     color: white;
 }
 
@@ -50,6 +58,7 @@
     max-width: 100%;
     height: auto;
     margin-top: 20px;
+    max-height: 400px;
 }
 
 .features {
@@ -75,4 +84,28 @@
 .feature-card p {
     font-size: 16px;
     color: #666;
+}
+
+lord-icon {
+    display: block;
+    margin: 0 auto;
+    /* Center the Lordicon */
+    padding: 20px;
+}
+
+.footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #f8f9fa;
+    color: #666;
+    font-size: 14px;
+}
+
+.footer a {
+    color: #1e90ff;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
 }
