@@ -20,7 +20,7 @@ jobs:  # Define the jobs to run
         run: npm install  # Run npm install to get dependencies
 
       - name: Build Angular app  # Step 4: Build the Angular app
-        run: npm run build -- --prod  # Run the Angular build command in production mode
+        run: npm run build -- --configuration production  # Use the correct flag for Angular 19
 
       - name: Configure AWS Credentials  # Step 5: Configure AWS credentials for S3 access
         uses: aws-actions/configure-aws-credentials@v1  # Use the configure-aws-credentials action (v1)
@@ -30,4 +30,4 @@ jobs:  # Define the jobs to run
           aws-region: eu-north-1  # AWS region (adjust if your bucket is in a different region)
 
       - name: Deploy to S3  # Step 6: Deploy the built files to S3
-        run: aws s3 sync dist/skillmatch/ s3://my-skillmatch-project-2025 --delete  # Sync the dist/skillmatch/ folder to S3
+        run: aws s3 sync dist/skill-match/ s3://my-skillmatch-project-2025 --delete  # Sync the dist/skill-match/ folder to S3
