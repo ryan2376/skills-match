@@ -18,14 +18,12 @@ export const routes: Routes = [
     { path: 'admin/jobs', component: AdminDashComponent },
     { path: 'admin/reports', component: AdminDashComponent },
     { path: 'admin/settings', component: AdminDashComponent },
-    { path: 'employer/dashboard', component: EmployerDashComponent }, // Add employer dashboard route
-    // Placeholder routes for sidebar links
+    { path: 'employer/dashboard', component: EmployerDashComponent },
     { path: 'employer/post-job', component: EmployerDashComponent },
     { path: 'employer/candidates', component: EmployerDashComponent },
     { path: 'employer/matches', component: EmployerDashComponent },
     { path: 'employer/settings', component: EmployerDashComponent },
-    { path: 'job-seeker/dashboard', component: JobSeekerDashComponent }, // Add job seeker dashboard route
-  // Placeholder routes for sidebar links
+    { path: 'job-seeker/dashboard', component: JobSeekerDashComponent }, 
     { path: 'job-seeker/profile', component: JobSeekerDashComponent },
     { path: 'job-seeker/applications', component: JobSeekerDashComponent },
     { path: 'job-seeker/matches', component: JobSeekerDashComponent },
