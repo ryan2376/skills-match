@@ -1,0 +1,104 @@
+<!-- src/app/components/Post-a-job/post-a-job.component.html -->
+<app-navbar></app-navbar>
+
+<!-- Main Content -->
+<div class="post-job-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>Employer Panel</h2>
+        <nav class="sidebar-nav">
+            <a routerLink="/employer/dashboard">Dashboard</a>
+            <a routerLink="/employer/post-job" class="active">Post Job</a>
+            <a routerLink="/employer/candidates">Candidates</a>
+            <a routerLink="/employer/matches">Matches</a>
+            <a routerLink="/employer/settings">Settings</a>
+        </nav>
+    </aside>
+
+    <!-- Post Job Form -->
+    <main class="main-content">
+        <h1>Post a Job</h1>
+
+        <form [formGroup]="jobForm" (ngSubmit)="onSubmit()" class="job-form">
+            <mat-form-field appearance="outline">
+                <mat-label>Job Title</mat-label>
+                <input matInput formControlName="jobTitle" required>
+                <mat-error *ngIf="jobForm.get('jobTitle')?.hasError('required')">Job Title is required</mat-error>
+                <mat-error *ngIf="jobForm.get('jobTitle')?.hasError('minlength')">Job Title must be at least 3
+                    characters</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Company Name</mat-label>
+                <input matInput formControlName="companyName" required>
+                <mat-error *ngIf="jobForm.get('companyName')?.hasError('required')">Company Name is required</mat-error>
+                <mat-error *ngIf="jobForm.get('companyName')?.hasError('minlength')">Company Name must be at least 2
+                    characters</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Location</mat-label>
+                <input matInput formControlName="location" required>
+                <mat-error *ngIf="jobForm.get('location')?.hasError('required')">Location is required</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Job Type</mat-label>
+                <mat-select formControlName="jobType" required>
+                    <mat-option *ngFor="let type of jobTypes" [value]="type">{{ type }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="jobForm.get('jobType')?.hasError('required')">Job Type is required</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Salary Range</mat-label>
+                <input matInput formControlName="salaryRange" placeholder="e.g., $50,000 - $70,000">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" rows="5" required></textarea>
+                <mat-error *ngIf="jobForm.get('description')?.hasError('required')">Description is required</mat-error>
+                <mat-error *ngIf="jobForm.get('description')?.hasError('minlength')">Description must be at least 10
+                    characters</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Requirements</mat-label>
+                <textarea matInput formControlName="requirements" rows="5" required></textarea>
+                <mat-error *ngIf="jobForm.get('requirements')?.hasError('required')">Requirements are
+                    required</mat-error>
+                <mat-error *ngIf="jobForm.get('requirements')?.hasError('minlength')">Requirements must be at least 10
+                    characters</mat-error>
+            </mat-form-field>
+
+            <!-- Skills Section -->
+            <div class="skills-section">
+                <h3>Skills</h3>
+                <div class="skills-chips">
+                    <mat-chip-listbox>
+                        <mat-chip *ngFor="let skill of skills" (removed)="removeSkill(skill)">
+                            {{ skill }}
+                            <button matChipRemove>
+                                <mat-icon>cancel</mat-icon>
+                            </button>
+                        </mat-chip>
+                    </mat-chip-listbox>
+                </div>
+                <mat-form-field appearance="outline" class="skill-input">
+                    <mat-label>Add a skill</mat-label>
+                    <input matInput (keyup.enter)="addSkill($event)" placeholder="e.g., JavaScript">
+                </mat-form-field>
+            </div>
+
+            <button mat-raised-button color="primary" type="submit" [disabled]="jobForm.invalid">Post Job</button>
+        </form>
+    </main>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>© 2025 SkillMatch AI. All rights reserved.</p>
+    <p><a href="https://www.flaticon.com/free-icons/network" title="network icons">Network icons created by Kiranshastry
+            - Flaticon</a></p>
+</footer>

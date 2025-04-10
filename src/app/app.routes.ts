@@ -6,6 +6,7 @@ import { LoginComponent } from './components/Login/login.component';
 import { AdminDashComponent } from './components/Admin-dash/admin-dash.component';
 import { EmployerDashComponent } from './components/Employer-dash/employer-dash.component'; // Import EmployerDashComponent
 import { JobSeekerDashComponent } from './components/Job-seeker-dash/job-seeker-dash.component';
+import { PostAJobComponent } from './components/Post-a-job/post-a-job.component';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -19,7 +20,7 @@ export const routes: Routes = [
     { path: 'admin/reports', component: AdminDashComponent },
     { path: 'admin/settings', component: AdminDashComponent },
     { path: 'employer/dashboard', component: EmployerDashComponent },
-    { path: 'employer/post-job', component: EmployerDashComponent },
+    { path: 'employer/post-job', component: PostAJobComponent },
     { path: 'employer/candidates', component: EmployerDashComponent },
     { path: 'employer/matches', component: EmployerDashComponent },
     { path: 'employer/settings', component: EmployerDashComponent },
