@@ -10,8 +10,8 @@ import { PostAJobComponent } from './components/Post-a-job/post-a-job.component'
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
-    { path: 'for-job-seekers', component: LandingPageComponent },
-    { path: 'for-employers', component: LandingPageComponent },
+    { path: 'for-job-seekers', component: JobSeekerDashComponent },
+    { path: 'for-employers', component: EmployerDashComponent },
     { path: 'login', component: LoginComponent },
     { path: 'signup', component: SignupComponent },
     { path: 'admin/dashboard', component: AdminDashComponent },
