@@ -3,36 +3,62 @@
 
 <!-- Hero Section -->
 <section class="hero">
-    <h1>Find Your Perfect Match with Skills, Not Titles</h1>
-    <p>AI-powered hiring for job seekers and employers</p>
-    <div class="hero-buttons">
-        <button mat-raised-button color="primary" routerLink="/signup">Get Started as Job Seeker</button>
-        <button mat-raised-button color="accent" routerLink="/signup">Hire Now</button>
+    <div class="hero-content">
+        <h1>Find Your Perfect Match with Skills, Not Titles</h1>
+        <p>AI-powered hiring for job seekers and employers</p>
+        <div class="hero-buttons">
+            <button class="job-seeker" mat-raised-button (click)="onGetStartedClick('Job Seeker')" routerLink="/for-job-seekers">Get Started as Job Seeker</button>
+            <button class="employer" mat-raised-button (click)="onGetStartedClick('Employer')" routerLink="/for-employers">Hire Now</button>
+        </div>
+        <img src="/network.png" alt="Hero Illustration" class="hero-image">
     </div>
-    <img src="/network.png" alt="Hero Illustration" class="hero-image">
 </section>
 
 <!-- Features Section -->
 <section class="features">
     <div class="feature-card">
+        <div class="feature-icon">
+            <mat-icon>person_search</mat-icon>
+        </div>
         <h3>Skill Matching</h3>
-        <p>Learn More</p>
-        <button mat-button color="primary">Learn More</button>
+        <p>We match you based on your skills, not your job title.</p>
+        <a href="#" routerLink="/signup" mat-button color="primary">Learn More</a>
     </div>
     <div class="feature-card">
+        <div class="feature-icon">
+            <mat-icon>work</mat-icon>
+        </div>
         <h3>Real-Time Updates</h3>
-        <p>Learn More</p>
-        <button mat-button color="primary">Learn More</button>
+        <p>Get instant notifications on job matches.</p>
+        <a href="#" routerLink="/signup" mat-button color="primary">Learn More</a>
     </div>
     <div class="feature-card">
+        <div class="feature-icon">
+            <mat-icon>school</mat-icon>
+        </div>
         <h3>Career Paths</h3>
-        <p>Learn More</p>
-        <button mat-button color="primary">Learn More</button>
+        <p>Explore AI-recommended career paths.</p>
+        <a href="#" routerLink="/signup" mat-button color="primary">Learn More</a>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials">
+    <h2>What Our Users Say</h2>
+    <div class="testimonial-cards">
+        <div class="testimonial-card">
+            <p>"SkillMatch helped me find a job that perfectly fits my skills!"</p>
+            <h4>Jane Doe, Software Engineer</h4>
+        </div>
+        <div class="testimonial-card">
+            <p>"Hiring has never been easier with SkillMatch's AI matching."</p>
+            <h4>John Smith, HR Manager</h4>
+        </div>
     </div>
 </section>
 
 <!-- Footer -->
-<footer class="footer">
-    <p>© 2025 SkillMatch AI. All rights reserved.</p>
+<div class="footer">
+    <p>© 2025 SkillMatch AI. All rights reserved. <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
     <p><a href="https://www.flaticon.com/free-icons/network" title="network icons">Network icons created by Kiranshastry - Flaticon</a></p>
-</footer>
+</div>
