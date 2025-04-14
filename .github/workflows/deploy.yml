@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: "18"
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Build Angular app
         run: npm run build -- --configuration production
       - name: List dist directory contents
@@ -36,11 +36,15 @@ jobs:
           path: dist/skill-match/browser/
           retention-days: 1
           if-no-files-found: error
+      - name: Confirm build job success
+        run: echo "Build job completed successfully"
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Confirm deploy job is running
+        run: echo "Deploy job is running"
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
