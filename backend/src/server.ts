@@ -16,6 +16,7 @@ import usersRoutes from "./routes/usersRoutes";
 import bookRoutes from "./routes/bookRoutes";
 import bookCopyRoutes from "./routes/bookCopyRoutes";
 import borrowRoutes from "./routes/borrowRoutes";
+import pool from "./config/db.config";
 
 dotenv.config()
 
@@ -43,7 +44,17 @@ app.use("/api/v1/bookCopy", bookCopyRoutes)
 app.use("/api/v1/borrow", borrowRoutes)
 // Middlewares for error handlers
 
-
+app.get('/test-db', async (req: express.Request, res: express.Response) => {
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT NOW()');
+        client.release();
+        res.json({ message: 'Database connection successful!', time: result.rows[0].now });
+    } catch (err) {
+        console.error('Database connection error:', (err as Error).stack);
+        res.status(500).json({ error: 'Failed to connect to database', details: (err as Error).message });
+    }
+});
 // start the server
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
