@@ -1,4 +1,4 @@
-// protect.ts
+// middlewares/auth/protect.ts
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import pool from "../../config/db.config";
@@ -27,7 +27,7 @@ export const protect = asyncHandler(async (req: UserRequest, res: Response, next
         }
 
         // Correct the type assertion to match the token payload
-        const decoded = jwt.verify(token, process.env.JWT_SECRET) as { user_id: number; role_id: number; iat: number; exp: number };
+        const decoded = jwt.verify(token, process.env.JWT_SECRET) as { user_id: number; role: string; iat: number; exp: number };
         console.log("Decoded Token:", decoded);
 
         // Ensure user_id is a number
@@ -37,7 +37,7 @@ export const protect = asyncHandler(async (req: UserRequest, res: Response, next
         }
 
         const userQuery = await pool.query(
-            "SELECT users.id, users.name, users.email, users.role_id, user_roles.role_name FROM users JOIN user_roles ON users.role_id = user_roles.role_id WHERE users.id = $1",
+            "SELECT id, email, role, first_name, last_name, created_at, updated_at FROM users WHERE id = $1",
             [userId]
         );
         console.log("Query Result:", userQuery.rows);
@@ -46,7 +46,8 @@ export const protect = asyncHandler(async (req: UserRequest, res: Response, next
             console.log("No user found for id:", userId);
             return res.status(401).json({ message: "User not found" });
         }
-        // attach user to request
+
+        // Attach user to request
         req.user = userQuery.rows[0];
         next();
     } catch (error) {
