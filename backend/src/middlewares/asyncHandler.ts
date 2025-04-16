@@ -1,4 +1,4 @@
-// asyncHandler.ts
+// middlewares/asyncHandler.ts
 import { Request, Response, NextFunction } from "express"
 /**
  * @desc - Avoud the problem of try catch not automatically passed to asynchnronous threads
