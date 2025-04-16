@@ -7,7 +7,7 @@ import { UserRole } from "./userTypes";
  */
 export interface RoleRequest extends Request {
     user?: {
-        id: number;
+        id: string; // Changed from number to string (UUID)
         email: string;
         role: UserRole;
         first_name: string;

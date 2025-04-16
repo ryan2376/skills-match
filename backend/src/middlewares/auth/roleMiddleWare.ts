@@ -15,6 +15,6 @@ export const roleGuard = (allowedRoles: UserRole[]) =>
     });
 
 // Specific guards for each role
-export const adminGuard = roleGuard([UserRole.Admin]);      // Full app control
-export const jobSeekerGuard = roleGuard([UserRole.JobSeeker]); // Job seeker actions (e.g., applying for jobs)
-export const employerGuard = roleGuard([UserRole.Employer]);   // Employer actions (e.g., posting jobs)
+export const adminGuard = roleGuard([UserRole.admin]);      // Full app control
+export const jobSeekerGuard = roleGuard([UserRole.job_seeker]); // Job seeker actions (e.g., applying for jobs)
+export const employerGuard = roleGuard([UserRole.employer]);   // Employer actions (e.g., posting jobs)

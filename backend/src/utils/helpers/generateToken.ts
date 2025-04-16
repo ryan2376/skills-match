@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 
 dotenv.config();
 
-export const generateToken = (res: Response, user_id: number, role: string) => {
+export const generateToken = (res: Response, user_id: string, role: string) => {
     const jwtSecret = process.env.JWT_SECRET;
     const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
 

@@ -16,7 +16,7 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
     }
 
     // Validate role (only "Job Seeker" or "Employer" allowed during registration)
-    if (role !== UserRole.JobSeeker && role !== UserRole.Employer) {
+    if (role !== UserRole.job_seeker && role !== UserRole.employer) {
         res.status(400).json({ message: "Role must be 'Job Seeker' or 'Employer'" });
         return;
     }

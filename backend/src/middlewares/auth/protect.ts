@@ -26,14 +26,14 @@ export const protect = asyncHandler(async (req: UserRequest, res: Response, next
             throw new Error("JWT_SECRET is not defined in environment variables");
         }
 
-        // Correct the type assertion to match the token payload
-        const decoded = jwt.verify(token, process.env.JWT_SECRET) as { user_id: number; role: string; iat: number; exp: number };
+        // Update the type assertion to expect user_id as a string (UUID)
+        const decoded = jwt.verify(token, process.env.JWT_SECRET) as { user_id: string; role: string; iat: number; exp: number };
         console.log("Decoded Token:", decoded);
 
-        // Ensure user_id is a number
+        // Validate user_id as a UUID string
         const userId = decoded.user_id;
-        if (typeof userId !== "number" || isNaN(userId)) {
-            throw new Error("Invalid user_id in token");
+        if (typeof userId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) {
+            throw new Error("Invalid user_id in token: must be a valid UUID");
         }
 
         const userQuery = await pool.query(
