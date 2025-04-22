@@ -91,6 +91,9 @@
                 </mat-form-field>
             </div>
 
+            <p *ngIf="success" style="color: green;">{{ success }}</p>
+            <p *ngIf="error" style="color: red;">{{ error }}</p>
+
             <button mat-raised-button color="primary" type="submit" [disabled]="jobForm.invalid">Post Job</button>
         </form>
     </main>

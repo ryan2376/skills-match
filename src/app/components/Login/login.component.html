@@ -19,9 +19,12 @@
             <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">Password must be at least 6 characters</mat-error>
         </mat-form-field>
 
-        <mat-checkbox formControlName="rememberMe">
-            Remember me
-        </mat-checkbox>
+        <div class="options">
+            <mat-checkbox formControlName="rememberMe">Remember me</mat-checkbox>
+            <a routerLink="/forgot-password">Forgot Password?</a>
+        </div>
+
+        <p *ngIf="error" style="color: red;">{{ error }}</p>
 
         <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">Sign In</button>
     </form>
