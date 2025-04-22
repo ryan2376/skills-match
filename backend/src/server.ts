@@ -11,6 +11,7 @@ import dotenv from "dotenv";
 // enable all middlewares
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import cvsRoutes from "./routes/cvsRoutes";
 dotenv.config();
 
 // instance of express
@@ -37,6 +38,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", usersRoutes);
 app.use("/api/v1/jobs", jobsRoutes);
 app.use("/api/v1/applications", applicationsRoutes);
+app.use("/api/v1/cvs", cvsRoutes);
 
 // load more middlewares - error handlers
 app.get("/test-db", async (req: express.Request, res: express.Response) => {
