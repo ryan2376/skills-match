@@ -105,6 +105,82 @@ export const scheduleInterview = asyncHandler(async (req: InterviewRequest, res:
     res.status(201).json(interview);
 });
 
+// Update interview status (Employer or Admin)
+export const updateInterviewStatus = asyncHandler(async (req: InterviewRequest, res: Response) => {
+    if (!req.user) {
+        return res.status(401).json({ message: "User not authenticated" });
+    }
+
+    const interviewId = req.params.interviewId;
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(interviewId)) {
+        return res.status(400).json({ message: "Invalid interview ID: must be a valid UUID" });
+    }
+
+    const { status } = req.body;
+
+    // Validate status
+    if (!status || !Object.values(InterviewStatus).includes(status)) {
+        return res.status(400).json({ message: "Invalid status. Must be 'pending', 'confirmed', 'completed', or 'canceled'" });
+    }
+
+    // Check if the interview exists and get the application_id
+    const interviewQuery = await pool.query(
+        "SELECT application_id FROM interviews WHERE id = $1",
+        [interviewId]
+    );
+
+    if (interviewQuery.rows.length === 0) {
+        return res.status(404).json({ message: "Interview not found" });
+    }
+
+    const { application_id } = interviewQuery.rows[0];
+
+    // Check if the user is the employer who scheduled the interview (via company) or an admin
+    const applicationQuery = await pool.query(
+        "SELECT job_id FROM applications WHERE id = $1",
+        [application_id]
+    );
+
+    if (applicationQuery.rows.length === 0) {
+        return res.status(404).json({ message: "Application not found" });
+    }
+
+    const { job_id } = applicationQuery.rows[0];
+
+    const jobQuery = await pool.query(
+        "SELECT company_id FROM jobs WHERE id = $1",
+        [job_id]
+    );
+
+    if (jobQuery.rows.length === 0) {
+        return res.status(404).json({ message: "Job not found" });
+    }
+
+    const { company_id } = jobQuery.rows[0];
+
+    if (req.user.role !== "admin") {
+        const companyQuery = await pool.query(
+            "SELECT user_id FROM companies WHERE id = $1",
+            [company_id]
+        );
+        if (companyQuery.rows.length === 0 || companyQuery.rows[0].user_id !== req.user.id) {
+            return res.status(403).json({ message: "Access denied: You can only update interviews for your own jobs" });
+        }
+    }
+
+    // Update the interview status
+    const result = await pool.query(
+        `UPDATE interviews
+         SET status = $1, updated_at = NOW()
+         WHERE id = $2
+         RETURNING id, application_id, scheduled_at, status, created_at, updated_at`,
+        [status, interviewId]
+    );
+
+    const updatedInterview: Interview = result.rows[0];
+    res.status(200).json(updatedInterview);
+});
+
 // Get interviews for a user (Job Seeker or Employer)
 export const getInterviews = asyncHandler(async (req: InterviewRequest, res: Response) => {
     const userId = req.params.userId;
