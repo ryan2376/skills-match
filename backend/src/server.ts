@@ -12,6 +12,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import cvsRoutes from "./routes/cvsRoutes";
+import interviewsRoutes from "./routes/interviewsRoutes";
 dotenv.config();
 
 // instance of express
@@ -39,6 +40,7 @@ app.use("/api/v1/users", usersRoutes);
 app.use("/api/v1/jobs", jobsRoutes);
 app.use("/api/v1/applications", applicationsRoutes);
 app.use("/api/v1/cvs", cvsRoutes);
+app.use("/api/v1/interviews", interviewsRoutes);
 
 // load more middlewares - error handlers
 app.get("/test-db", async (req: express.Request, res: express.Response) => {

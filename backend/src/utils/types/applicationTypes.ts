@@ -1,11 +1,13 @@
-// utils/types/applicationTypes.ts
+// src/utils/types/applicationTypes.ts
 import { Request } from "express";
 import { User } from "./userTypes";
 import { Job } from "./jobTypes";
 
-// Define the application_status enum
+// Define the application_status enum to match the database
 export enum ApplicationStatus {
-    pending = "pending",
+    submitted = "submitted",
+    under_review = "under_review",
+    interview = "interview",
     accepted = "accepted",
     rejected = "rejected",
 }

@@ -1,4 +1,4 @@
-// controllers/applicationsController.ts
+// src/controllers/applicationsController.ts
 import pool from "../config/db.config";
 import asyncHandler from "../middlewares/asyncHandler";
 import { Request, Response, NextFunction } from "express";
@@ -49,9 +49,9 @@ export const applyForJob = asyncHandler(async (req: ApplicationRequest, res: Res
         // Create the application
         const result = await pool.query(
             `INSERT INTO applications (user_id, job_id, status, applied_at, updated_at)
-       VALUES ($1, $2, $3, NOW(), NOW())
-       RETURNING id, user_id, job_id, status, applied_at, updated_at`,
-            [req.user.id, jobId, ApplicationStatus.pending]
+             VALUES ($1, $2, $3, NOW(), NOW())
+             RETURNING id, user_id, job_id, status, applied_at, updated_at`,
+            [req.user.id, jobId, ApplicationStatus.submitted] // Changed from pending to submitted
         );
 
         res.status(201).json(result.rows[0]);
@@ -103,9 +103,9 @@ export const getApplicationsForJob = asyncHandler(async (req: ApplicationRequest
         // Get all applications for the job
         const result = await pool.query(
             `SELECT id, user_id, job_id, status, applied_at, updated_at
-       FROM applications
-       WHERE job_id = $1
-       ORDER BY applied_at DESC`,
+             FROM applications
+             WHERE job_id = $1
+             ORDER BY applied_at DESC`,
             [jobId]
         );
 
@@ -171,16 +171,16 @@ export const updateApplicationStatus = asyncHandler(async (req: ApplicationReque
 
         // Validate status
         if (!status || !Object.values(ApplicationStatus).includes(status)) {
-            res.status(400).json({ message: "Invalid status. Must be 'pending', 'accepted', or 'rejected'" });
+            res.status(400).json({ message: "Invalid status. Must be 'submitted', 'under_review', 'interview', 'accepted', or 'rejected'" });
             return;
         }
 
         // Update the application
         const result = await pool.query(
             `UPDATE applications
-       SET status = $1, updated_at = NOW()
-       WHERE id = $2
-       RETURNING id, user_id, job_id, status, applied_at, updated_at`,
+             SET status = $1, updated_at = NOW()
+             WHERE id = $2
+             RETURNING id, user_id, job_id, status, applied_at, updated_at`,
             [status, applicationId]
         );
 
@@ -202,9 +202,9 @@ export const getApplicationsByJobSeeker = asyncHandler(async (req: ApplicationRe
         // Get all applications by the job seeker
         const result = await pool.query(
             `SELECT id, user_id, job_id, status, applied_at, updated_at
-            FROM applications
-            WHERE user_id = $1
-            ORDER BY applied_at DESC`,
+             FROM applications
+             WHERE user_id = $1
+             ORDER BY applied_at DESC`,
             [req.user.id]
         );
 
