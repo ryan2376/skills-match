@@ -20,7 +20,7 @@ COPY . .
 RUN pnpm run build
 
 # Expose the port the app runs on
-EXPOSE 3000
+EXPOSE 80
 
 # Command to run the app
 CMD ["node", "dist/server.js"]
