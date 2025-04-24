@@ -56,8 +56,8 @@ export const createJob = asyncHandler(async (req: JobRequest, res: Response) => 
         // Insert the new job
         const jobResult = await pool.query(
             `INSERT INTO jobs (company_id, title, description, location, status, created_at, updated_at)
-             VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
-             RETURNING id, company_id, title, description, location, status, created_at, updated_at`,
+            VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+            RETURNING id, company_id, title, description, location, status, created_at, updated_at`,
             [company_id, title, description, location, jobStatus]
         );
 
@@ -74,19 +74,19 @@ export const createJob = asyncHandler(async (req: JobRequest, res: Response) => 
 
                 let skillId;
                 if (skillResult.rows.length === 0) {
-                    // Insert new skill
-                    skillId = uuidv4();
-                    await pool.query(
-                        "INSERT INTO skills (id, name, created_at, updated_at) VALUES ($1, $2, NOW(), NOW())",
-                        [skillId, skill]
+                    // Insert new skill and let PostgreSQL generate the ID
+                    const insertSkillResult = await pool.query(
+                        "INSERT INTO skills (name, created_at, updated_at) VALUES ($1, NOW(), NOW()) RETURNING id",
+                        [skill]
                     );
+                    skillId = insertSkillResult.rows[0].id;
                 } else {
                     skillId = skillResult.rows[0].id;
                 }
 
                 // Link the skill to the job
                 await pool.query(
-                    "INSERT INTO job_skills (job_id, skill_id, created_at, updated_at) VALUES ($1, $2, NOW(), NOW())",
+                    "INSERT INTO job_skills (job_id, skill_id, created_at, updated_at) VALUES ($1::uuid, $2, NOW(), NOW()) ON CONFLICT DO NOTHING",
                     [newJob.id, skillId]
                 );
             }
@@ -332,18 +332,17 @@ export const getRecommendedJobs = asyncHandler(async (req: JobRequest, res: Resp
             return;
         }
 
-        // Get the user's skills from the user_skills table
+        // Get the user's skill IDs from the user_skills table
         const userSkillsQuery = await pool.query(
-            `SELECT s.name
-         FROM user_skills us
-         JOIN skills s ON us.skill_id = s.id
-         WHERE us.user_id = $1`,
+            `SELECT skill_id
+            FROM user_skills
+            WHERE user_id = $1`,
             [req.user.id]
         );
 
-        const userSkills = userSkillsQuery.rows.map(row => row.name);
+        const userSkillIds = userSkillsQuery.rows.map(row => row.skill_id);
 
-        if (userSkills.length === 0) {
+        if (userSkillIds.length === 0) {
             res.status(200).json([]); // No skills, return empty recommendations
             return;
         }
@@ -351,14 +350,13 @@ export const getRecommendedJobs = asyncHandler(async (req: JobRequest, res: Resp
         // Find jobs that match the user's skills
         const jobsQuery = await pool.query(
             `SELECT j.id, j.company_id, j.title, j.description, j.location, j.status, j.created_at, j.updated_at
-         FROM jobs j
-         JOIN job_skills js ON j.id = js.job_id
-         JOIN skills s ON js.skill_id = s.id
-         WHERE s.name = ANY($1::text[])
-           AND j.status = 'open'
-         GROUP BY j.id
-         ORDER BY j.created_at DESC`,
-            [userSkills]
+             FROM jobs j
+             JOIN job_skills js ON j.id = js.job_id
+             WHERE js.skill_id = ANY($1::int[])
+               AND j.status = 'open'
+             GROUP BY j.id
+             ORDER BY j.created_at DESC`,
+            [userSkillIds]
         );
 
         res.status(200).json(jobsQuery.rows);

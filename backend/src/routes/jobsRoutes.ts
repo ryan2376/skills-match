@@ -20,6 +20,12 @@ router.post("/", protect, employerGuard, createJob);
 // Get all jobs (Public)
 router.get("/", getJobs);
 
+// Get recommended jobs for the authenticated job seeker
+router.get("/recommended", protect, getRecommendedJobs);
+
+// Get all jobs by a specific employer (Employer or Admin)
+router.get("/employer/:employerId", protect, getJobsByEmployer);
+
 // Get a specific job by ID (Public)
 router.get("/:id", getJobById);
 
@@ -28,11 +34,5 @@ router.put("/:id", protect, updateJob);
 
 // Delete a job (Employer who posted it or Admin)
 router.delete("/:id", protect, deleteJob);
-
-// Get all jobs by a specific employer (Employer or Admin)
-router.get("/employer/:employerId", protect, getJobsByEmployer);
-
-// Get recommended jobs for the authenticated job seeker
-router.get("/recommended", protect, getRecommendedJobs);
 
 export default router;

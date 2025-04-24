@@ -1,8 +1,10 @@
 // src/app/services/api.service.ts
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
     providedIn: 'root'
@@ -10,104 +12,121 @@ import { catchError, switchMap } from 'rxjs/operators';
 export class ApiService {
     private apiUrl = 'http://localhost:80/api/v1';
     private token: string | null = null;
-    private userId: string | null = null; // Add this to store user ID
-    private refreshInProgress = false;
-    private retryQueue: Array<{ observable: Observable<any>, resolve: (value: any) => void, reject: (reason: any) => void }> = [];
+    private userId: string | null = null;
+    private role: string | null = null;
+    private refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
-    constructor(private http: HttpClient) {}
-
-    setToken(token: string) {
-        this.token = token;
-        localStorage.setItem('access_token', token);
+    constructor(
+        private http: HttpClient,
+        @Inject(PLATFORM_ID) private platformId: Object
+    ) {
+        this.loadFromLocalStorage();
     }
 
-    setUserId(userId: string) { // Add method to store user ID
+    private loadFromLocalStorage(): void {
+        if (isPlatformBrowser(this.platformId)) {
+            this.token = localStorage.getItem('access_token');
+            this.userId = localStorage.getItem('user_id');
+            if (this.token) {
+                const decoded: any = jwtDecode(this.token);
+                this.role = decoded.role;
+            }
+        }
+    }
+
+    setToken(token: string, userId: string): void {
+        this.token = token;
         this.userId = userId;
-        localStorage.setItem('user_id', userId);
+        if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('access_token', token);
+            localStorage.setItem('user_id', userId);
+        }
+        const decoded: any = jwtDecode(token);
+        this.role = decoded.role;
     }
 
     getToken(): string | null {
-        if (!this.token) {
-            this.token = localStorage.getItem('access_token');
-        }
         return this.token;
     }
 
-    getUserId(): string | null { // Add method to retrieve user ID
-        if (!this.userId) {
-            this.userId = localStorage.getItem('user_id');
-        }
+    getUserId(): string | null {
         return this.userId;
     }
 
-    clearToken() {
+    getUserRole(): string | null {
+        return this.role;
+    }
+
+    clearToken(): void {
         this.token = null;
-        this.userId = null; // Clear user ID as well
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('user_id');
+        this.userId = null;
+        this.role = null;
+        if (isPlatformBrowser(this.platformId)) {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user_id');
+        }
     }
 
     private getHeaders(): HttpHeaders {
-        let headers = new HttpHeaders();
-        const token = this.getToken();
-        if (token) {
-            headers = headers.set('Authorization', `Bearer ${token}`);
-        }
-        console.log('Request headers:', headers);
-        return headers;
+        return new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.token}`
+        });
     }
 
     private handle401Error(request: Observable<any>): Observable<any> {
-        if (this.refreshInProgress) {
-            return new Observable(observer => {
-                this.retryQueue.push({
-                    observable: request,
-                    resolve: observer.next.bind(observer),
-                    reject: observer.error.bind(observer)
-                });
-            });
-        }
+        this.clearToken();
+        return throwError(() => new Error('Session expired, please log in again'));
+    }
 
-        this.refreshInProgress = true;
-        return this.refreshToken().pipe(
-            switchMap((response) => {
-                this.setToken(response.access_token);
-                this.refreshInProgress = false;
-
-                this.retryQueue.forEach(item => {
-                    item.observable.subscribe({
-                        next: item.resolve,
-                        error: item.reject
-                    });
-                });
-                this.retryQueue = [];
-
-                return request;
-            }),
-            catchError((err) => {
-                this.refreshInProgress = false;
-                this.retryQueue = [];
-                this.clearToken();
-                window.location.href = '/login';
+    login(credentials: { email: string; password: string }): Observable<any> {
+        return this.http.post(`${this.apiUrl}/auth/login`, credentials, {
+            headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+            withCredentials: true
+        }).pipe(
+            catchError((err: HttpErrorResponse) => {
                 return throwError(() => err);
             })
         );
     }
 
-    refreshToken(): Observable<any> {
-        return this.http.post(`${this.apiUrl}/auth/refresh-token`, {}, { withCredentials: true });
-    }
-
-    login(email: string, password: string): Observable<any> {
-        return this.http.post(`${this.apiUrl}/auth/login`, { email, password }, { withCredentials: true });
-    }
-
-    signup(name: string, email: string, password: string): Observable<any> {
-        return this.http.post(`${this.apiUrl}/auth/register`, { first_name: name, email, password }, { withCredentials: true });
+    signup(user: { email: string; password: string; role: string; first_name: string; last_name: string }): Observable<any> {
+        return this.http.post(`${this.apiUrl}/auth/register`, user, {
+            headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+            withCredentials: true
+        }).pipe(
+            catchError((err: HttpErrorResponse) => {
+                return throwError(() => err);
+            })
+        );
     }
 
     getJobs(): Observable<any> {
         const request = this.http.get(`${this.apiUrl}/jobs`, { headers: this.getHeaders() });
+        return request.pipe(
+            catchError((err: HttpErrorResponse) => {
+                if (err.status === 401) {
+                    return this.handle401Error(request);
+                }
+                return throwError(() => err);
+            })
+        );
+    }
+
+    getRecommendedJobs(): Observable<any> {
+        const request = this.http.get(`${this.apiUrl}/jobs/recommended`, { headers: this.getHeaders() });
+        return request.pipe(
+            catchError((err: HttpErrorResponse) => {
+                if (err.status === 401) {
+                    return this.handle401Error(request);
+                }
+                return throwError(() => err);
+            })
+        );
+    }
+
+    getInterviews(userId: string): Observable<any> {
+        const request = this.http.get(`${this.apiUrl}/interviews/${userId}`, { headers: this.getHeaders() });
         return request.pipe(
             catchError((err: HttpErrorResponse) => {
                 if (err.status === 401) {
@@ -130,8 +149,8 @@ export class ApiService {
         );
     }
 
-    postJob(jobData: any): Observable<any> {
-        const request = this.http.post(`${this.apiUrl}/jobs`, jobData, { headers: this.getHeaders() });
+    addSkills(skills: string[]): Observable<any> {
+        const request = this.http.post(`${this.apiUrl}/users/skills`, { skills }, { headers: this.getHeaders() });
         return request.pipe(
             catchError((err: HttpErrorResponse) => {
                 if (err.status === 401) {
@@ -142,8 +161,8 @@ export class ApiService {
         );
     }
 
-    getInterviews(userId: string): Observable<any> {
-        const request = this.http.get(`${this.apiUrl}/interviews/${userId}`, { headers: this.getHeaders() });
+    postJob(job: { title: string; description: string; location: string; skills: string[] }): Observable<any> {
+        const request = this.http.post(`${this.apiUrl}/jobs`, job, { headers: this.getHeaders() });
         return request.pipe(
             catchError((err: HttpErrorResponse) => {
                 if (err.status === 401) {
