@@ -45,11 +45,11 @@ export class LoginComponent {
     onSubmit(): void {
         if (this.loginForm.valid) {
             const { email, password } = this.loginForm.value;
-            this.apiService.login(email, password).subscribe({
+            const credentials = { email, password }; // Create credentials object
+            this.apiService.login(credentials).subscribe({
                 next: (response) => {
                     console.log('Login response:', response);
-                    this.apiService.setToken(response.access_token);
-                    this.apiService.setUserId(response.user.id); // Store the user ID
+                    this.apiService.setToken(response.access_token, response.user.id); // Pass both token and userId
                     console.log('Token set:', this.apiService.getToken());
                     console.log('User ID set:', this.apiService.getUserId());
                     const userRole = response.user.role;

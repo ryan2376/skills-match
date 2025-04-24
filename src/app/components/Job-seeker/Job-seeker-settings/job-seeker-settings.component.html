@@ -1,0 +1,54 @@
+<!-- src/app/components/Job-seeker-settings/job-seeker-settings.component.html -->
+<app-navbar></app-navbar>
+
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <h2>Job Seeker Panel</h2>
+        <nav class="sidebar-nav">
+            <a routerLink="/job-seeker/dashboard">Dashboard</a>
+            <a routerLink="/job-seeker/profile">Profile</a>
+            <a routerLink="/job-seeker/applications">Applications</a>
+            <a routerLink="/job-seeker/matches">Matches</a>
+            <a routerLink="/job-seeker/saved-jobs">Saved Jobs</a>
+            <a routerLink="/job-seeker/settings" class="active">Settings</a>
+            <a (click)="logout()" style="cursor: pointer;">Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h1>My Settings</h1>
+
+        <!-- Settings Section -->
+        <div class="settings-section">
+            <div *ngIf="error" style="color: red;">{{ error }}</div>
+            <div *ngIf="success" style="color: #32cd32;">{{ success }}</div>
+            <div *ngIf="loading" class="loading">Saving settings...</div>
+
+            <mat-card class="settings-card">
+                <mat-card-content>
+                    <div class="setting-item">
+                        <mat-checkbox [(ngModel)]="settings.emailNotifications">
+                            Email Notifications
+                        </mat-checkbox>
+                    </div>
+                    <div class="setting-item">
+                        <mat-checkbox [(ngModel)]="settings.jobAlerts">
+                            Job Alerts
+                        </mat-checkbox>
+                    </div>
+                    <button mat-raised-button color="primary" (click)="saveSettings()" [disabled]="loading">
+                        Save Settings
+                    </button>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </main>
+</div>
+
+<footer class="footer">
+    <p>© 2025 SkillMatch AI. All rights reserved.</p>
+    <p>
+        <a href="https://www.flaticon.com/free-icons/network" title="network icons">Network icons created by
+            Kiranshastry - Flaticon</a>
+    </p>
+</footer>

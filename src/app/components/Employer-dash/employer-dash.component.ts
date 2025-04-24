@@ -56,4 +56,6 @@ export class EmployerDashComponent {
     console.log('Close job:', job);
     // Add logic to close job posting
   }
+
+  
 }

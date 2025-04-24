@@ -1,4 +1,4 @@
-/* src/app/components/Job-seeker-dash/job-seeker-dash.component.css */
+/* src/app/components/job-seeker-dash/job-seeker-dash.component.css */
 .dashboard-container {
     display: flex;
     min-height: calc(100vh - 200px);
@@ -51,6 +51,54 @@
     color: #333;
 }
 
+.skills-section {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px;
+}
+
+.skills-section h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.skills-chips {
+    margin-bottom: 10px;
+}
+
+.skill-input {
+    width: 100%;
+    max-width: 300px;
+}
+
+.loading {
+    font-size: 16px;
+    color: #1e90ff;
+    margin: 10px 0;
+}
+
+button[mat-raised-button] {
+    background-color: #1e90ff;
+    color: white;
+    margin-top: 10px;
+}
+
+button[mat-raised-button]:hover {
+    background-color: #32cd32;
+}
+
+button[mat-mini-fab] {
+    background-color: #1e90ff;
+    color: white;
+}
+
+button[mat-mini-fab]:hover {
+    background-color: #32cd32;
+}
+
 .overview-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -82,6 +130,13 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     overflow-x: auto;
+    margin-bottom: 40px;
+}
+
+.table-container h2 {
+    font-size: 24px;
+    color: #333;
+    margin: 20px 20px 10px;
 }
 
 table {

@@ -1,0 +1,70 @@
+<!-- src/app/components/Job-seeker-profile/job-seeker-profile.component.html -->
+<app-navbar></app-navbar>
+
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <h2>Job Seeker Panel</h2>
+        <nav class="sidebar-nav">
+            <a routerLink="/job-seeker/dashboard">Dashboard</a>
+            <a routerLink="/job-seeker/profile" class="active">Profile</a>
+            <a routerLink="/job-seeker/applications">Applications</a>
+            <a routerLink="/job-seeker/matches">Matches</a>
+            <a routerLink="/job-seeker/saved-jobs">Saved Jobs</a>
+            <a routerLink="/job-seeker/settings">Settings</a>
+            <a (click)="logout()" style="cursor: pointer;">Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h1>My Profile</h1>
+
+        <!-- Profile Section -->
+        <div class="profile-section">
+            <div *ngIf="error" style="color: red;">{{ error }}</div>
+            <div *ngIf="success" style="color: #32cd32;">{{ success }}</div>
+            <div *ngIf="loading" class="loading">Saving profile...</div>
+
+            <mat-card class="profile-card">
+                <mat-card-content>
+                    <div *ngIf="!editMode; else editForm">
+                        <p><strong>First Name:</strong> {{ profile.firstName }}</p>
+                        <p><strong>Last Name:</strong> {{ profile.lastName }}</p>
+                        <p><strong>Email:</strong> {{ profile.email }}</p>
+                        <p><strong>Skills:</strong> {{ profile.skills.join(', ') }}</p>
+                        <button mat-raised-button color="primary" (click)="toggleEditMode()">Edit Profile</button>
+                    </div>
+                    <ng-template #editForm>
+                        <mat-form-field appearance="outline" class="profile-input">
+                            <mat-label>First Name</mat-label>
+                            <input matInput [(ngModel)]="profile.firstName" placeholder="First Name" required />
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="profile-input">
+                            <mat-label>Last Name</mat-label>
+                            <input matInput [(ngModel)]="profile.lastName" placeholder="Last Name" required />
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="profile-input">
+                            <mat-label>Email</mat-label>
+                            <input matInput [(ngModel)]="profile.email" type="email" placeholder="Email" required />
+                        </mat-form-field>
+                        <div>
+                            <button mat-raised-button color="primary" (click)="saveProfile()" [disabled]="loading">
+                                Save Changes
+                            </button>
+                            <button mat-raised-button (click)="toggleEditMode()" style="margin-left: 10px;">
+                                Cancel
+                            </button>
+                        </div>
+                    </ng-template>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </main>
+</div>
+
+<footer class="footer">
+    <p>© 2025 SkillMatch AI. All rights reserved.</p>
+    <p>
+        <a href="https://www.flaticon.com/free-icons/network" title="network icons">Network icons created by
+            Kiranshastry - Flaticon</a>
+    </p>
+</footer>
