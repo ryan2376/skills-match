@@ -33,17 +33,13 @@ import { ApiService } from '../../services/api.service';
 export class PostAJobComponent implements OnInit {
     jobForm: FormGroup;
     skills: string[] = [];
-    jobTypes: string[] = ['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Freelance'];
     error: string | null = null;
     success: string | null = null;
 
     constructor(private fb: FormBuilder, private apiService: ApiService) {
         this.jobForm = this.fb.group({
             jobTitle: ['', [Validators.required, Validators.minLength(3)]],
-            companyName: ['', [Validators.required, Validators.minLength(2)]],
             location: ['', [Validators.required]],
-            jobType: ['', [Validators.required]],
-            salaryRange: ['', []],
             description: ['', [Validators.required, Validators.minLength(10)]],
             requirements: ['', [Validators.required, Validators.minLength(10)]]
         });
@@ -53,11 +49,13 @@ export class PostAJobComponent implements OnInit {
 
     onSubmit(): void {
         if (this.jobForm.valid) {
+            const { jobTitle, location, description, requirements } = this.jobForm.value;
+            const combinedDescription = `${description}\n\n**Requirements:**\n${requirements}`;
+
             const jobData = {
-                title: this.jobForm.value.jobTitle,
-                company_id: '397fae38-4d97-4e21-8f88-a2fcb35c5421', // Hardcoded for John Doe’s company (Fluxtech Solutions)
-                location: this.jobForm.value.location,
-                description: this.jobForm.value.description,
+                title: jobTitle,
+                location: location,
+                description: combinedDescription,
                 status: 'open', // Default status for new jobs
                 skills: this.skills
             };
