@@ -1,0 +1,94 @@
+<!-- src/app/components/Employer/Candidates/candidates.component.html -->
+<app-navbar></app-navbar>
+
+<!-- Main Content -->
+<div class="candidates-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>Employer Panel</h2>
+        <nav class="sidebar-nav">
+            <a routerLink="/employer/dashboard">Dashboard</a>
+            <a routerLink="/employer/post-job">Post Job</a>
+            <a routerLink="/employer/candidates" class="active">Candidates</a>
+            <a routerLink="/employer/matches">Matches</a>
+            <a routerLink="/employer/settings">Settings</a>
+            <a (click)="logout()" class="logout">Log Out</a>
+        </nav>
+    </aside>
+
+    <!-- Candidates Content -->
+    <main class="main-content">
+        <h1>Candidates</h1>
+
+        <!-- Error Message -->
+        <p *ngIf="error" class="error-message">{{ error }}</p>
+
+        <!-- Job Selection -->
+        <mat-card class="job-selection-card">
+            <mat-card-header>
+                <mat-card-title>Select Job</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <mat-form-field appearance="outline">
+                    <mat-label>Job</mat-label>
+                    <mat-select [(ngModel)]="selectedJob" (selectionChange)="onJobChange($event.value)">
+                        <mat-option *ngFor="let job of jobs" [value]="job">
+                            {{ job.title }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Applications Table -->
+        <mat-card *ngIf="selectedJob" class="applications-card">
+            <mat-card-header>
+                <mat-card-title>Applications for {{ selectedJob.title }}</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <mat-table [dataSource]="applications">
+                    <!-- Job Seeker Name Column -->
+                    <ng-container matColumnDef="job_seeker_name">
+                        <mat-header-cell *matHeaderCellDef> Candidate </mat-header-cell>
+                        <mat-cell *matCellDef="let app"> {{ app.job_seeker_name }} </mat-cell>
+                    </ng-container>
+
+                    <!-- Status Column -->
+                    <ng-container matColumnDef="status">
+                        <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+                        <mat-cell *matCellDef="let app"> {{ app.status.charAt(0).toUpperCase() + app.status.slice(1) }}
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Applied At Column -->
+                    <ng-container matColumnDef="applied_at">
+                        <mat-header-cell *matHeaderCellDef> Applied At </mat-header-cell>
+                        <mat-cell *matCellDef="let app"> {{ app.applied_at | date:'medium' }} </mat-cell>
+                    </ng-container>
+
+                    <!-- Actions Column -->
+                    <ng-container matColumnDef="actions">
+                        <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
+                        <mat-cell *matCellDef="let app">
+                            <button mat-raised-button color="primary" (click)="viewApplication(app.id)">View</button>
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Table Header and Rows -->
+                    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+                </mat-table>
+            </mat-card-content>
+        </mat-card>
+    </main>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>© 2025 SkillMatch AI. All rights reserved.</p>
+    <p>
+        <a href="https://www.flaticon.com/free-icons/network" title="network icons">
+            Network icons created by Kiranshastry - Flaticon
+        </a>
+    </p>
+</footer>

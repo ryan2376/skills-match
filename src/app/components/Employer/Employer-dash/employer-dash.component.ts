@@ -1,4 +1,4 @@
-// src/app/components/Employer-dash/employer-dash.component.ts
+// src/app/components/Employer/Employer-dash/employer-dash.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -46,7 +46,6 @@ export class EmployerDashComponent implements OnInit {
       return;
     }
 
-    // Verify user role
     const role = this.apiService.getUserRole();
     if (role !== 'employer') {
       this.error = 'Access denied: Only employers can access this dashboard';
@@ -61,16 +60,15 @@ export class EmployerDashComponent implements OnInit {
   loadJobs(userId: string): void {
     this.apiService.getJobsByEmployer(userId).subscribe({
       next: (jobs) => {
-        this.overviewStats[0].value = jobs.length; // Posted Jobs
+        this.overviewStats[0].value = jobs.length;
         this.dataSource = jobs.map((job: any) => ({
           id: job.id,
           title: job.title,
-          applications: 0, // Will be updated below
-          matches: 0, // Will be updated below
-          status: job.status.charAt(0).toUpperCase() + job.status.slice(1) // Capitalize status (e.g., 'open' -> 'Open')
+          applications: 0,
+          matches: 0,
+          status: job.status.charAt(0).toUpperCase() + job.status.slice(1)
         }));
 
-        // Fetch applications for each job to calculate applications and matches
         let totalApplications = 0;
         let totalMatches = 0;
 
@@ -86,41 +84,44 @@ export class EmployerDashComponent implements OnInit {
               totalApplications += appCount;
               totalMatches += matchCount;
 
-              this.overviewStats[1].value = totalApplications; // Applications Received
-              this.overviewStats[2].value = totalMatches; // Matches Found
+              this.overviewStats[1].value = totalApplications;
+              this.overviewStats[2].value = totalMatches;
             },
             error: (err) => {
-              this.error = err.message || 'Failed to load applications';
               console.error('Error loading applications for job:', err);
+              this.dataSource[index].applications = 0;
+              this.dataSource[index].matches = 0;
+              this.error = this.error || 'Failed to load application data for some jobs.';
             }
           });
         });
       },
       error: (err) => {
-        this.error = err.message || 'Failed to load jobs';
+        this.error = 'Failed to load jobs. Please try again later.';
         console.error('Error loading jobs:', err);
       }
     });
   }
 
   loadInterviews(userId: string): void {
-    this.apiService.getInterviews(userId).subscribe({
+    this.apiService.getInterviewsForEmployer(userId).subscribe({
       next: (interviews) => {
-        this.overviewStats[3].value = interviews.length; // Interviews Scheduled
+        this.overviewStats[3].value = interviews.length;
       },
       error: (err) => {
-        this.error = err.message || 'Failed to load interviews';
+        this.error = this.error || 'Failed to load interviews.';
         console.error('Error loading interviews:', err);
+        this.overviewStats[3].value = 0;
       }
     });
   }
 
   viewJob(job: any): void {
-    this.router.navigate(['/employer/job', job.id]); // Navigate to job details page (to be created)
+    this.router.navigate(['/employer/job', job.id]);
   }
 
   editJob(job: any): void {
-    this.router.navigate(['/employer/edit-job', job.id]); // Navigate to edit job page (to be created)
+    this.router.navigate(['/employer/edit-job', job.id]);
   }
 
   closeJob(job: any): void {
@@ -131,8 +132,8 @@ export class EmployerDashComponent implements OnInit {
 
     const updatedJob = {
       title: job.title,
-      description: job.description || '', // Provide default if not available
-      location: job.location || '', // Provide default if not available
+      description: job.description || '',
+      location: job.location || '',
       status: 'closed'
     };
 
@@ -144,9 +145,14 @@ export class EmployerDashComponent implements OnInit {
         }
       },
       error: (err) => {
-        this.error = err.message || 'Failed to close job';
+        this.error = 'Failed to close job';
         console.error('Error closing job:', err);
       }
     });
+  }
+
+  logout(): void {
+    this.apiService.clearAuthInfo();
+    this.router.navigate(['/login']);
   }
 }

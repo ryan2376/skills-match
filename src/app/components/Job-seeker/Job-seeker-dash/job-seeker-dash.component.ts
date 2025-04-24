@@ -95,7 +95,7 @@ export class JobSeekerDashComponent implements OnInit {
     loadInterviews(userId: string): void {
         console.log('Fetching interviews for user:', userId);
         console.log('Token:', this.apiService.getToken());
-        this.apiService.getInterviews(userId).subscribe({
+        this.apiService.getInterviewsForJobSeeker(userId).subscribe({
             next: (response) => {
                 console.log('Interviews response:', response);
                 this.overviewStats[2].value = response.length;
@@ -129,7 +129,7 @@ export class JobSeekerDashComponent implements OnInit {
     }
 
     logout(): void {
-        this.apiService.clearToken();
+        this.apiService.clearAuthInfo();
         this.router.navigate(['/login']);
     }
 

@@ -1,0 +1,69 @@
+<!-- src/app/components/Employer/ApplicationDetails/application-details.component.html -->
+<app-navbar></app-navbar>
+
+<!-- Main Content -->
+<div class="application-details-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>Employer Panel</h2>
+        <nav class="sidebar-nav">
+            <a routerLink="/employer/dashboard">Dashboard</a>
+            <a routerLink="/employer/post-job">Post Job</a>
+            <a routerLink="/employer/candidates">Candidates</a>
+            <a routerLink="/employer/matches">Matches</a>
+            <a routerLink="/employer/settings">Settings</a>
+            <a (click)="logout()" class="logout">Log Out</a>
+        </nav>
+    </aside>
+
+    <!-- Application Details Content -->
+    <main class="main-content">
+        <h1>Application Details</h1>
+
+        <!-- Error/Success Messages -->
+        <p *ngIf="error" class="error-message">{{ error }}</p>
+        <p *ngIf="success" class="success-message">{{ success }}</p>
+
+        <!-- Application Details Card -->
+        <mat-card *ngIf="application" class="application-card">
+            <mat-card-header>
+                <mat-card-title>{{ application.job_seeker_name }}'s Application</mat-card-title>
+                <mat-card-subtitle>Job: {{ application.title }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <p><strong>Status:</strong> {{ application.status.charAt(0).toUpperCase() + application.status.slice(1)
+                    }}</p>
+                <p><strong>Applied At:</strong> {{ application.applied_at | date:'medium' }}</p>
+                <p><strong>Updated At:</strong> {{ application.updated_at | date:'medium' }}</p>
+                <p><strong>Job Location:</strong> {{ application.location }}</p>
+                <p><strong>Job Description:</strong> {{ application.description }}</p>
+                <p><strong>Skills Required:</strong> {{ application.skills.join(', ') }}</p>
+
+                <!-- Status Update Form -->
+                <mat-form-field appearance="outline">
+                    <mat-label>Update Status</mat-label>
+                    <mat-select [(ngModel)]="selectedStatus">
+                        <mat-option *ngFor="let status of statusOptions" [value]="status">
+                            {{ status.charAt(0).toUpperCase() + status.slice(1) }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </mat-card-content>
+            <mat-card-actions>
+                <button mat-raised-button color="primary" (click)="updateStatus()">Update Status</button>
+                <button mat-raised-button color="accent" [routerLink]="['/employer/candidates']">Back to
+                    Candidates</button>
+            </mat-card-actions>
+        </mat-card>
+    </main>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>© 2025 SkillMatch AI. All rights reserved.</p>
+    <p>
+        <a href="https://www.flaticon.com/free-icons/network" title="network icons">
+            Network icons created by Kiranshastry - Flaticon
+        </a>
+    </p>
+</footer>

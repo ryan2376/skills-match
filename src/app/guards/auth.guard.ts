@@ -1,7 +1,7 @@
 // src/app/guards/auth.guard.ts
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { ApiService } from '../services/api.service'
+import { ApiService } from '../services/api.service';
 
 export const authGuard: CanActivateFn = (route, state) => {
     const apiService = inject(ApiService);
@@ -9,19 +9,26 @@ export const authGuard: CanActivateFn = (route, state) => {
 
     const token = apiService.getToken();
     const userId = apiService.getUserId();
+    const userRole = apiService.getUserRole();
 
+    // If there's no token or userId, redirect to login
     if (!token || !userId) {
-        router.navigate(['/login']);
-        return false;
+        return router.createUrlTree(['/login']);
     }
 
-    // Optionally, check user role based on the route
+    // If there's no user role, redirect to login (just to be safe)
+    if (!userRole) {
+        return router.createUrlTree(['/login']);
+    }
+
+    // Check if the route has a required role in its data
     const expectedRole = route.data['role'];
-    const userRole = apiService.getUserRole(); // We'll add this method to ApiService
+
+    // If the route requires a specific role and the user doesn't match, redirect to login
     if (expectedRole && userRole !== expectedRole) {
-        router.navigate(['/login']);
-        return false;
+        return router.createUrlTree(['/login']);
     }
 
+    // Allow access if all checks pass
     return true;
 };

@@ -78,7 +78,7 @@ export class JobSeekerSavedJobsComponent implements OnInit {
     }
 
     logout(): void {
-        this.apiService.clearToken();
+        this.apiService.clearAuthInfo(); // Updated to clearAuthInfo
         this.router.navigate(['/login']);
     }
 }

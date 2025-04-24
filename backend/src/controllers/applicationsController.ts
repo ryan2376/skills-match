@@ -51,7 +51,7 @@ export const applyForJob = asyncHandler(async (req: ApplicationRequest, res: Res
             `INSERT INTO applications (user_id, job_id, status, applied_at, updated_at)
              VALUES ($1, $2, $3, NOW(), NOW())
              RETURNING id, user_id, job_id, status, applied_at, updated_at`,
-            [req.user.id, jobId, ApplicationStatus.submitted] // Changed from pending to submitted
+            [req.user.id, jobId, ApplicationStatus.submitted]
         );
 
         res.status(201).json(result.rows[0]);
@@ -100,12 +100,14 @@ export const getApplicationsForJob = asyncHandler(async (req: ApplicationRequest
             }
         }
 
-        // Get all applications for the job
+        // Get all applications for the job, including the job seeker's name
         const result = await pool.query(
-            `SELECT id, user_id, job_id, status, applied_at, updated_at
-             FROM applications
-             WHERE job_id = $1
-             ORDER BY applied_at DESC`,
+            `SELECT a.id, a.user_id, a.job_id, a.status, a.applied_at, a.updated_at,
+                    u.first_name || ' ' || u.last_name AS job_seeker_name
+            FROM applications a
+            JOIN users u ON a.user_id = u.id
+            WHERE a.job_id = $1
+            ORDER BY a.applied_at DESC`,
             [jobId]
         );
 
@@ -211,6 +213,70 @@ export const getApplicationsByJobSeeker = asyncHandler(async (req: ApplicationRe
         res.status(200).json(result.rows);
     } catch (error) {
         console.error("Error fetching applications:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+// Get a single application by ID (Employer who posted the job or Admin)
+export const getApplicationById = asyncHandler(async (req: ApplicationRequest, res: Response) => {
+    try {
+        const applicationId = req.params.applicationId;
+        if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(applicationId)) {
+            res.status(400).json({ message: "Invalid application ID: must be a valid UUID" });
+            return;
+        }
+
+        if (!req.user) {
+            res.status(401).json({ message: "User not authenticated" });
+            return;
+        }
+
+        // Fetch the application with job seeker name and job details
+        const applicationQuery = await pool.query(
+            `SELECT a.id, a.user_id, a.job_id, a.status, a.applied_at, a.updated_at,
+                    u.first_name || ' ' || u.last_name AS job_seeker_name,
+                    j.title, j.description, j.location, j.skills
+             FROM applications a
+             JOIN users u ON a.user_id = u.id
+             JOIN jobs j ON a.job_id = j.id
+             WHERE a.id = $1`,
+            [applicationId]
+        );
+
+        if (applicationQuery.rows.length === 0) {
+            res.status(404).json({ message: "Application not found" });
+            return;
+        }
+
+        const application = applicationQuery.rows[0];
+
+        // Check if the user is the employer who posted the job (via company) or an admin
+        const jobQuery = await pool.query(
+            "SELECT company_id FROM jobs WHERE id = $1",
+            [application.job_id]
+        );
+
+        if (jobQuery.rows.length === 0) {
+            res.status(404).json({ message: "Job not found" });
+            return;
+        }
+
+        const job = jobQuery.rows[0];
+
+        if (req.user.role !== "admin") {
+            const companyQuery = await pool.query(
+                "SELECT user_id FROM companies WHERE id = $1",
+                [job.company_id]
+            );
+            if (companyQuery.rows.length === 0 || companyQuery.rows[0].user_id !== req.user.id) {
+                res.status(403).json({ message: "Access denied: You can only view applications for your own jobs" });
+                return;
+            }
+        }
+
+        res.status(200).json(application);
+    } catch (error) {
+        console.error("Error fetching application:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 });

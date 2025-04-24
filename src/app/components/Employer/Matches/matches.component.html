@@ -1,0 +1,76 @@
+<!-- src/app/components/Employer/Matches/matches.component.html -->
+<app-navbar></app-navbar>
+
+<!-- Main Content -->
+<div class="matches-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>Employer Panel</h2>
+        <nav class="sidebar-nav">
+            <a routerLink="/employer/dashboard">Dashboard</a>
+            <a routerLink="/employer/post-job">Post Job</a>
+            <a routerLink="/employer/candidates">Candidates</a>
+            <a routerLink="/employer/matches" class="active">Matches</a>
+            <a routerLink="/employer/settings">Settings</a>
+            <a (click)="logout()" class="logout">Log Out</a>
+        </nav>
+    </aside>
+
+    <!-- Matches Content -->
+    <main class="main-content">
+        <h1>Matches</h1>
+
+        <!-- Error Message -->
+        <p *ngIf="error" class="error-message">{{ error }}</p>
+
+        <!-- Matches Table -->
+        <div class="table-container">
+            <div *ngIf="dataSource.length === 0 && !error" class="no-data">
+                No matches found for your jobs yet.
+            </div>
+            <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" *ngIf="dataSource.length > 0">
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>Name</th>
+                    <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+                </ng-container>
+
+                <!-- Job Title Column -->
+                <ng-container matColumnDef="jobTitle">
+                    <th mat-header-cell *matHeaderCellDef>Job Title</th>
+                    <td mat-cell *matCellDef="let element">{{ element.jobTitle }}</td>
+                </ng-container>
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef>Status</th>
+                    <td mat-cell *matCellDef="let element">{{ element.status }}</td>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef>Actions</th>
+                    <td mat-cell *matCellDef="let element">
+                        <button mat-icon-button color="primary" (click)="viewApplication(element)">
+                            <mat-icon>visibility</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+
+                <!-- Table Header and Rows -->
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+        </div>
+    </main>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>© 2025 SkillMatch AI. All rights reserved.</p>
+    <p>
+        <a href="https://www.flaticon.com/free-icons/network" title="network icons">
+            Network icons created by Kiranshastry - Flaticon
+        </a>
+    </p>
+</footer>

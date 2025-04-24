@@ -1,0 +1,65 @@
+<!-- src/app/components/Employer/Settings/settings.component.html -->
+<app-navbar></app-navbar>
+
+<!-- Main Content -->
+<div class="settings-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>Employer Panel</h2>
+        <nav class="sidebar-nav">
+            <a routerLink="/employer/dashboard">Dashboard</a>
+            <a routerLink="/employer/post-job">Post Job</a>
+            <a routerLink="/employer/candidates">Candidates</a>
+            <a routerLink="/employer/matches">Matches</a>
+            <a routerLink="/employer/settings" class="active">Settings</a>
+            <a (click)="logout()" class="logout">Log Out</a>
+        </nav>
+    </aside>
+
+    <!-- Settings Content -->
+    <main class="main-content">
+        <h1>Settings</h1>
+
+        <!-- Profile Form -->
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+            <mat-form-field appearance="outline">
+                <mat-label>First Name</mat-label>
+                <input matInput formControlName="firstName" required>
+                <mat-error *ngIf="profileForm.get('firstName')?.hasError('required')">First Name is required</mat-error>
+                <mat-error *ngIf="profileForm.get('firstName')?.hasError('minlength')">First Name must be at least 2
+                    characters</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Last Name</mat-label>
+                <input matInput formControlName="lastName" required>
+                <mat-error *ngIf="profileForm.get('lastName')?.hasError('required')">Last Name is required</mat-error>
+                <mat-error *ngIf="profileForm.get('lastName')?.hasError('minlength')">Last Name must be at least 2
+                    characters</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" required>
+                <mat-error *ngIf="profileForm.get('email')?.hasError('required')">Email is required</mat-error>
+                <mat-error *ngIf="profileForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+            </mat-form-field>
+
+            <p *ngIf="success" style="color: green;">{{ success }}</p>
+            <p *ngIf="error" style="color: red;">{{ error }}</p>
+
+            <button mat-raised-button color="primary" type="submit" [disabled]="profileForm.invalid">Update
+                Profile</button>
+        </form>
+    </main>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>© 2025 SkillMatch AI. All rights reserved.</p>
+    <p>
+        <a href="https://www.flaticon.com/free-icons/network" title="network icons">
+            Network icons created by Kiranshastry - Flaticon
+        </a>
+    </p>
+</footer>

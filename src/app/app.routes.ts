@@ -12,11 +12,13 @@ import { JobSeekerApplicationsComponent } from './components/Job-seeker/Job-seek
 import { JobSeekerMatchesComponent } from './components/Job-seeker/Job-seeker-matches/job-seeker-matches.component';
 import { JobSeekerSavedJobsComponent } from './components/Job-seeker/Job-seeker-saved-jobs/job-seeker-saved-jobs.component';
 import { JobSeekerSettingsComponent } from './components/Job-seeker/Job-seeker-settings/job-seeker-settings.component';
-import { authGuard } from './guards/auth.guard';
-
-// Placeholder imports for new components (we'll create these next)
 import { JobDetailsComponent } from './components/Employer/Job-details/job-details.component';
 import { EditJobComponent } from './components/Employer/Edit-job/edit-job.component';
+import { CandidatesComponent } from './components/Employer/Candidates/candidates.component';
+import { MatchesComponent } from './components/Employer/Matches/matches.component';
+import { SettingsComponent } from './components/Employer/Settings/settings.component';
+import { ApplicationDetailsComponent } from './components/Employer/ApplicationDetails/application-details.component'; // Import the new component
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -44,11 +46,12 @@ export const routes: Routes = [
         children: [
             { path: 'dashboard', component: EmployerDashComponent },
             { path: 'post-job', component: PostAJobComponent },
-            { path: 'candidates', component: EmployerDashComponent }, // Placeholder, to be updated later
-            { path: 'matches', component: EmployerDashComponent }, // Placeholder, to be updated later
-            { path: 'settings', component: EmployerDashComponent }, // Placeholder, to be updated later
-            { path: 'job/:id', component: JobDetailsComponent }, // New route for viewing job details
-            { path: 'edit-job/:id', component: EditJobComponent }, // New route for editing a job
+            { path: 'candidates', component: CandidatesComponent },
+            { path: 'matches', component: MatchesComponent },
+            { path: 'settings', component: SettingsComponent },
+            { path: 'job/:id', component: JobDetailsComponent },
+            { path: 'edit-job/:id', component: EditJobComponent },
+            { path: 'application/:applicationId', component: ApplicationDetailsComponent }, // New route
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
         ],
     },

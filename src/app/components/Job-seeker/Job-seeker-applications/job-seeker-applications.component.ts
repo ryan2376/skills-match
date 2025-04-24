@@ -50,7 +50,7 @@ export class JobSeekerApplicationsComponent implements OnInit {
     }
 
     logout(): void {
-        this.apiService.clearToken();
+        this.apiService.clearAuthInfo();
         this.router.navigate(['/login']);
     }
 }
