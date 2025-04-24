@@ -3,6 +3,8 @@ import pool from "../config/db.config";
 import asyncHandler from "../middlewares/asyncHandler";
 import { Request, Response, NextFunction } from "express";
 import { UserRequest } from "../utils/types/userTypes";
+import { v4 as uuidv4 } from "uuid";
+import { JobRequest } from "../utils/types/jobTypes";
 
 // Get all users (Admin only)
 export const getUsers = asyncHandler(async (req: UserRequest, res: Response) => {
@@ -148,6 +150,72 @@ export const deleteUser = asyncHandler(async (req: UserRequest, res: Response) =
         res.status(200).json({ message: "User deleted successfully" });
     } catch (error) {
         console.error("Error deleting user:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+// Add skills to the authenticated job seeker's profile
+export const addUserSkills = asyncHandler(async (req: JobRequest, res: Response) => {
+    try {
+        if (!req.user) {
+            res.status(401).json({ message: "User not authenticated" });
+            return;
+        }
+
+        if (req.user.role !== "job_seeker") {
+            res.status(403).json({ message: "Access denied: Only job seekers can add skills" });
+            return;
+        }
+
+        const { skills } = req.body;
+
+        // Validate input
+        if (!skills || !Array.isArray(skills) || skills.length === 0 || skills.some((skill: any) => typeof skill !== "string")) {
+            res.status(400).json({ message: "Skills must be a non-empty array of strings" });
+            return;
+        }
+
+        // Process each skill
+        const skillIds: number[] = []; // Change to number[] since skills.id is an integer
+        for (const skill of skills) {
+            // Check if the skill already exists
+            let skillResult = await pool.query(
+                "SELECT id FROM skills WHERE name = $1",
+                [skill]
+            );
+
+            let skillId: number;
+            if (skillResult.rows.length === 0) {
+                // Insert new skill (let PostgreSQL generate the ID)
+                const insertResult = await pool.query(
+                    "INSERT INTO skills (name, created_at, updated_at) VALUES ($1, NOW(), NOW()) RETURNING id",
+                    [skill]
+                );
+                skillId = insertResult.rows[0].id;
+            } else {
+                skillId = skillResult.rows[0].id;
+            }
+
+            skillIds.push(skillId);
+        }
+
+        // Link the skills to the user in user_skills (avoid duplicates)
+        for (const skillId of skillIds) {
+            const existingLink = await pool.query(
+                "SELECT 1 FROM user_skills WHERE user_id = $1::uuid AND skill_id = $2",
+                [req.user.id, skillId]
+            );
+
+            if (existingLink.rows.length === 0) {
+                await pool.query(
+                    "INSERT INTO user_skills (user_id, skill_id, created_at, updated_at) VALUES ($1::uuid, $2, NOW(), NOW())",
+                    [req.user.id, skillId]
+                );
+            }
+        }
+
+        res.status(200).json({ message: "Skills added successfully" });
+    } catch (error) {
+        console.error("Error adding user skills:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 });

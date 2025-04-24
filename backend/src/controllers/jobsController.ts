@@ -1,8 +1,9 @@
-// controllers/jobsController.ts
+// src/controllers/jobsController.ts
 import pool from "../config/db.config";
 import asyncHandler from "../middlewares/asyncHandler";
 import { Request, Response, NextFunction } from "express";
 import { JobRequest, JobStatus } from "../utils/types/jobTypes";
+import { v4 as uuidv4 } from "uuid";
 
 // Create a new job (Employer only)
 export const createJob = asyncHandler(async (req: JobRequest, res: Response) => {
@@ -12,11 +13,11 @@ export const createJob = asyncHandler(async (req: JobRequest, res: Response) => 
             return;
         }
 
-        const { title, description, location, company_id, status } = req.body;
+        const { title, description, location, status, skills } = req.body;
 
         // Validate input
-        if (!title || !description || !location || !company_id) {
-            res.status(400).json({ message: "Title, description, location, and company_id are required" });
+        if (!title || !description || !location) {
+            res.status(400).json({ message: "Title, description, and location are required" });
             return;
         }
 
@@ -33,26 +34,65 @@ export const createJob = asyncHandler(async (req: JobRequest, res: Response) => 
             return;
         }
 
-        // Check if the company exists and belongs to the user
-        const companyQuery = await pool.query(
-            "SELECT id FROM companies WHERE id = $1 AND user_id = $2",
-            [company_id, req.user.id]
-        );
-
-        if (companyQuery.rows.length === 0) {
-            res.status(403).json({ message: "Company not found or you do not have permission to post jobs for this company" });
+        // Validate skills if provided
+        if (skills && (!Array.isArray(skills) || skills.some((skill: any) => typeof skill !== "string"))) {
+            res.status(400).json({ message: "Skills must be an array of strings" });
             return;
         }
 
+        // Fetch the company_id from the authenticated user's record
+        const userQuery = await pool.query(
+            "SELECT company_id FROM users WHERE id = $1",
+            [req.user.id]
+        );
+
+        if (userQuery.rows.length === 0 || !userQuery.rows[0].company_id) {
+            res.status(403).json({ message: "No company associated with this employer" });
+            return;
+        }
+
+        const company_id = userQuery.rows[0].company_id;
+
         // Insert the new job
-        const result = await pool.query(
+        const jobResult = await pool.query(
             `INSERT INTO jobs (company_id, title, description, location, status, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
-       RETURNING id, company_id, title, description, location, status, created_at, updated_at`,
+             VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+             RETURNING id, company_id, title, description, location, status, created_at, updated_at`,
             [company_id, title, description, location, jobStatus]
         );
 
-        res.status(201).json(result.rows[0]);
+        const newJob = jobResult.rows[0];
+
+        // Handle skills if provided
+        if (skills && skills.length > 0) {
+            for (const skill of skills) {
+                // Check if the skill already exists
+                let skillResult = await pool.query(
+                    "SELECT id FROM skills WHERE name = $1",
+                    [skill]
+                );
+
+                let skillId;
+                if (skillResult.rows.length === 0) {
+                    // Insert new skill
+                    skillId = uuidv4();
+                    await pool.query(
+                        "INSERT INTO skills (id, name, created_at, updated_at) VALUES ($1, $2, NOW(), NOW())",
+                        [skillId, skill]
+                    );
+                } else {
+                    skillId = skillResult.rows[0].id;
+                }
+
+                // Link the skill to the job
+                await pool.query(
+                    "INSERT INTO job_skills (job_id, skill_id, created_at, updated_at) VALUES ($1, $2, NOW(), NOW())",
+                    [newJob.id, skillId]
+                );
+            }
+        }
+
+        res.status(201).json(newJob);
     } catch (error) {
         console.error("Error creating job:", error);
         res.status(500).json({ error: "Internal server error" });
@@ -64,8 +104,8 @@ export const getJobs = asyncHandler(async (req: Request, res: Response) => {
     try {
         const result = await pool.query(
             `SELECT id, company_id, title, description, location, status, created_at, updated_at
-       FROM jobs
-       ORDER BY created_at DESC`
+             FROM jobs
+             ORDER BY created_at DESC`
         );
         res.status(200).json(result.rows);
     } catch (error) {
@@ -85,8 +125,8 @@ export const getJobById = asyncHandler(async (req: Request, res: Response) => {
 
         const result = await pool.query(
             `SELECT id, company_id, title, description, location, status, created_at, updated_at
-       FROM jobs
-       WHERE id = $1`,
+             FROM jobs
+             WHERE id = $1`,
             [jobId]
         );
 
@@ -119,8 +159,8 @@ export const updateJob = asyncHandler(async (req: JobRequest, res: Response) => 
         // Check if the job exists and get the company_id
         const jobQuery = await pool.query(
             `SELECT company_id
-       FROM jobs
-       WHERE id = $1`,
+             FROM jobs
+             WHERE id = $1`,
             [jobId]
         );
 
@@ -167,9 +207,9 @@ export const updateJob = asyncHandler(async (req: JobRequest, res: Response) => 
         // Update the job
         const result = await pool.query(
             `UPDATE jobs
-       SET title = $1, description = $2, location = $3, status = COALESCE($4, status), updated_at = NOW()
-       WHERE id = $5
-       RETURNING id, company_id, title, description, location, status, created_at, updated_at`,
+             SET title = $1, description = $2, location = $3, status = COALESCE($4, status), updated_at = NOW()
+             WHERE id = $5
+             RETURNING id, company_id, title, description, location, status, created_at, updated_at`,
             [title, description, location, newStatus, jobId]
         );
 
@@ -197,8 +237,8 @@ export const deleteJob = asyncHandler(async (req: JobRequest, res: Response) => 
         // Check if the job exists and get the company_id
         const jobQuery = await pool.query(
             `SELECT company_id
-            FROM jobs
-            WHERE id = $1`,
+             FROM jobs
+             WHERE id = $1`,
             [jobId]
         );
 
@@ -266,15 +306,64 @@ export const getJobsByEmployer = asyncHandler(async (req: JobRequest, res: Respo
         // Find all jobs posted by those companies
         const result = await pool.query(
             `SELECT id, company_id, title, description, location, status, created_at, updated_at
-            FROM jobs
-            WHERE company_id = ANY($1)
-            ORDER BY created_at DESC`,
+             FROM jobs
+             WHERE company_id = ANY($1)
+             ORDER BY created_at DESC`,
             [companyIds]
         );
 
         res.status(200).json(result.rows);
     } catch (error) {
         console.error("Error fetching jobs by employer:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+// Get recommended jobs for the authenticated job seeker
+export const getRecommendedJobs = asyncHandler(async (req: JobRequest, res: Response) => {
+    try {
+        if (!req.user) {
+            res.status(401).json({ message: "User not authenticated" });
+            return;
+        }
+
+        if (req.user.role !== "job_seeker") {
+            res.status(403).json({ message: "Access denied: Only job seekers can access recommended jobs" });
+            return;
+        }
+
+        // Get the user's skills from the user_skills table
+        const userSkillsQuery = await pool.query(
+            `SELECT s.name
+         FROM user_skills us
+         JOIN skills s ON us.skill_id = s.id
+         WHERE us.user_id = $1`,
+            [req.user.id]
+        );
+
+        const userSkills = userSkillsQuery.rows.map(row => row.name);
+
+        if (userSkills.length === 0) {
+            res.status(200).json([]); // No skills, return empty recommendations
+            return;
+        }
+
+        // Find jobs that match the user's skills
+        const jobsQuery = await pool.query(
+            `SELECT j.id, j.company_id, j.title, j.description, j.location, j.status, j.created_at, j.updated_at
+         FROM jobs j
+         JOIN job_skills js ON j.id = js.job_id
+         JOIN skills s ON js.skill_id = s.id
+         WHERE s.name = ANY($1::text[])
+           AND j.status = 'open'
+         GROUP BY j.id
+         ORDER BY j.created_at DESC`,
+            [userSkills]
+        );
+
+        res.status(200).json(jobsQuery.rows);
+    } catch (error) {
+        console.error("Error fetching recommended jobs:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 });

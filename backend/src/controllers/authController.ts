@@ -1,4 +1,4 @@
-// controllers/authController.ts
+// src/controllers/authController.ts
 import pool from "../config/db.config";
 import asyncHandler from "../middlewares/asyncHandler";
 import { Request, Response, NextFunction } from "express";
@@ -6,9 +6,10 @@ import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/helpers/generateToken";
 import { UserRole } from "../utils/types/userTypes";
 import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
 
 export const registerUser = asyncHandler(async (req: Request, res: Response) => {
-    const { first_name, last_name, email, password, role } = req.body;
+    const { first_name, last_name, email, password, role, company_name } = req.body;
 
     if (!first_name || !last_name || !email || !password || !role) {
         res.status(400).json({ message: "All fields are required" });
@@ -17,6 +18,11 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
 
     if (role !== UserRole.job_seeker && role !== UserRole.employer) {
         res.status(400).json({ message: "Role must be 'Job Seeker' or 'Employer'" });
+        return;
+    }
+
+    if (role === UserRole.employer && !company_name) {
+        res.status(400).json({ message: "Company name is required for employers" });
         return;
     }
 
@@ -29,11 +35,30 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Step 1: Create the user without company_id first
     const newUser = await pool.query(
         "INSERT INTO users (first_name, last_name, email, password_hash, role, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING id, first_name, last_name, email, role, created_at, updated_at",
         [first_name, last_name, email, hashedPassword, role]
     );
 
+    let company_id = null;
+    if (role === UserRole.employer) {
+        // Step 2: Create the company with the user's id as user_id
+        const companyId = uuidv4();
+        const companyResult = await pool.query(
+            "INSERT INTO companies (id, name, user_id, created_at, updated_at) VALUES ($1, $2, $3, NOW(), NOW()) RETURNING id",
+            [companyId, company_name, newUser.rows[0].id]
+        );
+        company_id = companyResult.rows[0].id;
+
+        // Step 3: Update the user with the company_id
+        await pool.query(
+            "UPDATE users SET company_id = $1 WHERE id = $2",
+            [company_id, newUser.rows[0].id]
+        );
+    }
+
+    // Generate tokens and send the response
     generateToken(res, newUser.rows[0].id, newUser.rows[0].role);
 
     res.status(201).json({
