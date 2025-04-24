@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Build Angular app
-        run: pnpm run build -- --configuration production
+        run: pnpm run build --configuration=production
       - name: List dist directory contents
         run: ls -la dist/skill-match/
       - name: Check if browser folder exists
