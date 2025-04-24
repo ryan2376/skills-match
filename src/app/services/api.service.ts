@@ -16,7 +16,7 @@ interface DecodedToken {
     providedIn: 'root'
 })
 export class ApiService {
-    private apiUrl = 'http://13.49.224.93//api/v1';
+    private apiUrl = 'http://13.49.224.93/api/v1';
     private token: string | null = null;
     private userId: string | null = null;
     private role: string | null = null;
