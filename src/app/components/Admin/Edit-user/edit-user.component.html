@@ -1,0 +1,69 @@
+<!-- src/app/components/Admin/edit-user/edit-user.component.html -->
+<app-navbar></app-navbar>
+
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <h2>Admin Panel</h2>
+        <nav class="sidebar-nav">
+            <a routerLink="/admin/dashboard">Dashboard</a>
+            <a routerLink="/admin/users">Users</a>
+            <a routerLink="/admin/jobs">Jobs</a>
+            <a routerLink="/admin/settings">Settings</a>
+            <a (click)="logout()" style="cursor: pointer;">Log Out</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h1>Edit User</h1>
+        <div *ngIf="error" class="error-message">
+            {{ error }}
+        </div>
+        <mat-card *ngIf="user" class="edit-card">
+            <mat-card-content>
+                <form (ngSubmit)="onSubmit()">
+                    <mat-form-field appearance="fill">
+                        <mat-label>First Name</mat-label>
+                        <input matInput [(ngModel)]="user.first_name" name="first_name" required>
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                        <mat-label>Last Name</mat-label>
+                        <input matInput [(ngModel)]="user.last_name" name="last_name" required>
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                        <mat-label>Email</mat-label>
+                        <input matInput [(ngModel)]="user.email" name="email" type="email" required>
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                        <mat-label>Role</mat-label>
+                        <mat-select [(ngModel)]="user.role" name="role">
+                            <mat-option value="admin">Admin</mat-option>
+                            <mat-option value="employer">Employer</mat-option>
+                            <mat-option value="job_seeker">Job Seeker</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                        <mat-label>Status</mat-label>
+                        <mat-select [(ngModel)]="user.status" name="status">
+                            <mat-option value="active">Active</mat-option>
+                            <mat-option value="inactive">Inactive</mat-option>
+                            <mat-option value="pending">Pending</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-card-actions>
+                        <button mat-raised-button color="primary" type="submit">Save</button>
+                        <button mat-raised-button color="warn" (click)="goBack()">Cancel</button>
+                    </mat-card-actions>
+                </form>
+            </mat-card-content>
+        </mat-card>
+    </main>
+</div>
+
+<footer class="footer">
+    <p>© 2025 SkillMatch AI. All rights reserved.</p>
+    <p>
+        <a href="https://www.flaticon.com/free-icons/network" title="network icons">
+            Network icons created by Kiranshastry - Flaticon
+        </a>
+    </p>
+</footer>

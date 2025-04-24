@@ -1,9 +1,19 @@
 // src/controllers/jobsController.ts
 import pool from "../config/db.config";
 import asyncHandler from "../middlewares/asyncHandler";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { JobRequest, JobStatus } from "../utils/types/jobTypes";
-import { v4 as uuidv4 } from "uuid";
+
+// Get total jobs (Admin only)
+export const getTotalJobs = asyncHandler(async (req: JobRequest, res: Response) => {
+    if (!req.user) {
+        return res.status(401).json({ message: "User not authenticated" });
+    }
+
+    const result = await pool.query("SELECT COUNT(*) AS total FROM jobs");
+    const total = parseInt(result.rows[0].total, 10);
+    res.status(200).json({ total });
+});
 
 // Create a new job (Employer only)
 export const createJob = asyncHandler(async (req: JobRequest, res: Response) => {
@@ -15,32 +25,27 @@ export const createJob = asyncHandler(async (req: JobRequest, res: Response) => 
 
         const { title, description, location, status, skills } = req.body;
 
-        // Validate input
         if (!title || !description || !location) {
             res.status(400).json({ message: "Title, description, and location are required" });
             return;
         }
 
-        // Validate location length
         if (location.length > 100) {
             res.status(400).json({ message: "Location must be 100 characters or less" });
             return;
         }
 
-        // Validate status if provided
         const jobStatus = status || JobStatus.open;
         if (!Object.values(JobStatus).includes(jobStatus)) {
             res.status(400).json({ message: "Invalid status. Must be 'open' or 'closed'" });
             return;
         }
 
-        // Validate skills if provided
         if (skills && (!Array.isArray(skills) || skills.some((skill: any) => typeof skill !== "string"))) {
             res.status(400).json({ message: "Skills must be an array of strings" });
             return;
         }
 
-        // Fetch the company_id from the authenticated user's record
         const userQuery = await pool.query(
             "SELECT company_id FROM users WHERE id = $1",
             [req.user.id]
@@ -53,20 +58,17 @@ export const createJob = asyncHandler(async (req: JobRequest, res: Response) => 
 
         const company_id = userQuery.rows[0].company_id;
 
-        // Insert the new job
         const jobResult = await pool.query(
             `INSERT INTO jobs (company_id, title, description, location, status, created_at, updated_at)
-            VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
-            RETURNING id, company_id, title, description, location, status, created_at, updated_at`,
+             VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+             RETURNING id, company_id, title, description, location, status, created_at, updated_at`,
             [company_id, title, description, location, jobStatus]
         );
 
         const newJob = jobResult.rows[0];
 
-        // Handle skills if provided
         if (skills && skills.length > 0) {
             for (const skill of skills) {
-                // Check if the skill already exists
                 let skillResult = await pool.query(
                     "SELECT id FROM skills WHERE name = $1",
                     [skill]
@@ -74,7 +76,6 @@ export const createJob = asyncHandler(async (req: JobRequest, res: Response) => 
 
                 let skillId;
                 if (skillResult.rows.length === 0) {
-                    // Insert new skill and let PostgreSQL generate the ID
                     const insertSkillResult = await pool.query(
                         "INSERT INTO skills (name, created_at, updated_at) VALUES ($1, NOW(), NOW()) RETURNING id",
                         [skill]
@@ -84,7 +85,6 @@ export const createJob = asyncHandler(async (req: JobRequest, res: Response) => 
                     skillId = skillResult.rows[0].id;
                 }
 
-                // Link the skill to the job
                 await pool.query(
                     "INSERT INTO job_skills (job_id, skill_id, created_at, updated_at) VALUES ($1::uuid, $2, NOW(), NOW()) ON CONFLICT DO NOTHING",
                     [newJob.id, skillId]
@@ -156,7 +156,6 @@ export const updateJob = asyncHandler(async (req: JobRequest, res: Response) => 
             return;
         }
 
-        // Check if the job exists and get the company_id
         const jobQuery = await pool.query(
             `SELECT company_id
              FROM jobs
@@ -171,7 +170,6 @@ export const updateJob = asyncHandler(async (req: JobRequest, res: Response) => 
 
         const job = jobQuery.rows[0];
 
-        // Check if the user is the employer who posted the job (via company) or an admin
         if (req.user.role !== "admin") {
             const companyQuery = await pool.query(
                 "SELECT user_id FROM companies WHERE id = $1",
@@ -185,26 +183,22 @@ export const updateJob = asyncHandler(async (req: JobRequest, res: Response) => 
 
         const { title, description, location, status } = req.body;
 
-        // Validate input
         if (!title || !description || !location) {
             res.status(400).json({ message: "Title, description, and location are required" });
             return;
         }
 
-        // Validate location length
         if (location.length > 100) {
             res.status(400).json({ message: "Location must be 100 characters or less" });
             return;
         }
 
-        // Validate status if provided
         let newStatus = status;
         if (newStatus && !Object.values(JobStatus).includes(newStatus)) {
             res.status(400).json({ message: "Invalid status. Must be 'open' or 'closed'" });
             return;
         }
 
-        // Update the job
         const result = await pool.query(
             `UPDATE jobs
              SET title = $1, description = $2, location = $3, status = COALESCE($4, status), updated_at = NOW()
@@ -234,7 +228,6 @@ export const deleteJob = asyncHandler(async (req: JobRequest, res: Response) => 
             return;
         }
 
-        // Check if the job exists and get the company_id
         const jobQuery = await pool.query(
             `SELECT company_id
              FROM jobs
@@ -249,7 +242,6 @@ export const deleteJob = asyncHandler(async (req: JobRequest, res: Response) => 
 
         const job = jobQuery.rows[0];
 
-        // Check if the user is the employer who posted the job (via company) or an admin
         if (req.user.role !== "admin") {
             const companyQuery = await pool.query(
                 "SELECT user_id FROM companies WHERE id = $1",
@@ -261,7 +253,6 @@ export const deleteJob = asyncHandler(async (req: JobRequest, res: Response) => 
             }
         }
 
-        // Delete the job
         await pool.query("DELETE FROM jobs WHERE id = $1", [jobId]);
 
         res.status(200).json({ message: "Job deleted successfully" });
@@ -285,13 +276,11 @@ export const getJobsByEmployer = asyncHandler(async (req: JobRequest, res: Respo
             return;
         }
 
-        // Check if the user is the employer or an admin
         if (req.user.role !== "admin" && req.user.id !== employerId) {
             res.status(403).json({ message: "Access denied: You can only view your own jobs" });
             return;
         }
 
-        // Find all companies owned by the employer
         const companiesQuery = await pool.query(
             "SELECT id FROM companies WHERE user_id = $1",
             [employerId]
@@ -299,11 +288,10 @@ export const getJobsByEmployer = asyncHandler(async (req: JobRequest, res: Respo
 
         const companyIds = companiesQuery.rows.map(row => row.id);
         if (companyIds.length === 0) {
-            res.status(200).json([]); // No companies, so no jobs
+            res.status(200).json([]);
             return;
         }
 
-        // Find all jobs posted by those companies
         const result = await pool.query(
             `SELECT id, company_id, title, description, location, status, created_at, updated_at
              FROM jobs
@@ -332,22 +320,20 @@ export const getRecommendedJobs = asyncHandler(async (req: JobRequest, res: Resp
             return;
         }
 
-        // Get the user's skill IDs from the user_skills table
         const userSkillsQuery = await pool.query(
             `SELECT skill_id
-            FROM user_skills
-            WHERE user_id = $1`,
+             FROM user_skills
+             WHERE user_id = $1`,
             [req.user.id]
         );
 
         const userSkillIds = userSkillsQuery.rows.map(row => row.skill_id);
 
         if (userSkillIds.length === 0) {
-            res.status(200).json([]); // No skills, return empty recommendations
+            res.status(200).json([]);
             return;
         }
 
-        // Find jobs that match the user's skills
         const jobsQuery = await pool.query(
             `SELECT j.id, j.company_id, j.title, j.description, j.location, j.status, j.created_at, j.updated_at
              FROM jobs j

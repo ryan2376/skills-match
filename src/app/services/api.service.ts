@@ -291,4 +291,89 @@ getApplicationsForJob(jobId: string): Observable<any> {
             })
         );
     }
+
+    getTotalUsers(): Observable<any> {
+        const request = this.http.get(`${this.apiUrl}/users/total`, { headers: this.getHeaders() });
+        return request.pipe(
+            catchError((err: HttpErrorResponse) => {
+                if (err.status === 401) {
+                    return this.handle401Error(request);
+                }
+                return throwError(() => err);
+            })
+        );
+    }
+
+    getUserById(userId: string): Observable<any> {
+        const request = this.http.get(`${this.apiUrl}/users/${userId}`, { headers: this.getHeaders() });
+        return request.pipe(
+            catchError((err: HttpErrorResponse) => {
+                if (err.status === 401) {
+                    return this.handle401Error(request);
+                }
+                return throwError(() => err);
+            })
+        );
+    }
+    
+    getTotalJobs(): Observable<any> {
+        const request = this.http.get(`${this.apiUrl}/jobs/total`, { headers: this.getHeaders() });
+        return request.pipe(
+            catchError((err: HttpErrorResponse) => {
+                if (err.status === 401) {
+                    return this.handle401Error(request);
+                }
+                return throwError(() => err);
+            })
+        );
+    }
+    
+    getTotalEmployers(): Observable<any> {
+        const request = this.http.get(`${this.apiUrl}/users/employers/total`, { headers: this.getHeaders() });
+        return request.pipe(
+            catchError((err: HttpErrorResponse) => {
+                if (err.status === 401) {
+                    return this.handle401Error(request);
+                }
+                return throwError(() => err);
+            })
+        );
+    }
+    
+    getPendingReports(): Observable<any> {
+        const request = this.http.get(`${this.apiUrl}/reports/pending`, { headers: this.getHeaders() });
+        return request.pipe(
+            catchError((err: HttpErrorResponse) => {
+                if (err.status === 401) {
+                    return this.handle401Error(request);
+                }
+                return throwError(() => err);
+            })
+        );
+    }
+    
+    getAllUsers(): Observable<any> {
+        const request = this.http.get(`${this.apiUrl}/users`, { headers: this.getHeaders() });
+        return request.pipe(
+            catchError((err: HttpErrorResponse) => {
+                if (err.status === 401) {
+                    return this.handle401Error(request);
+                }
+                return throwError(() => err);
+            })
+        );
+    }
+    
+    deleteUser(userId: string): Observable<any> {
+        const request = this.http.delete(`${this.apiUrl}/users/${userId}`, { headers: this.getHeaders() });
+        return request.pipe(
+            catchError((err: HttpErrorResponse) => {
+                if (err.status === 401) {
+                    return this.handle401Error(request);
+                }
+                return throwError(() => err);
+            })
+        );
+    }
 }
+

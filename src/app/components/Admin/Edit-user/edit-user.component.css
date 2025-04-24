@@ -1,0 +1,115 @@
+/* src/app/components/Admin/edit-user/edit-user.component.css */
+.dashboard-container {
+    display: flex;
+    min-height: calc(100vh - 200px);
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #1e90ff;
+    color: white;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar-nav a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.sidebar-nav a:hover {
+    background-color: #32cd32;
+}
+
+.sidebar-nav a.active {
+    background-color: #32cd32;
+}
+
+.main-content {
+    flex: 1;
+    padding: 40px;
+    background-color: #f5f5f5;
+}
+
+.main-content h1 {
+    font-size: 36px;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border: 1px solid #f5c6cb;
+}
+
+.edit-card {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+mat-form-field {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+mat-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+button[mat-raised-button] {
+    background-color: #1e90ff;
+    color: white;
+}
+
+button[mat-raised-button]:hover {
+    background-color: #32cd32;
+}
+
+button[mat-raised-button][color="warn"] {
+    background-color: #f44336;
+}
+
+button[mat-raised-button][color="warn"]:hover {
+    background-color: #d32f2f;
+}
+
+.footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #f8f9fa;
+    color: #666;
+    font-size: 14px;
+}
+
+.footer a {
+    color: #1e90ff;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}

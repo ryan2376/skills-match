@@ -1,0 +1,29 @@
+<!-- src/app/components/Admin/jobs/jobs.component.html -->
+<app-navbar></app-navbar>
+
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <h2>Admin Panel</h2>
+        <nav class="sidebar-nav">
+            <a routerLink="/admin/dashboard">Dashboard</a>
+            <a routerLink="/admin/users">Users</a>
+            <a routerLink="/admin/jobs" class="active">Jobs</a>
+            <a routerLink="/admin/settings">Settings</a>
+            <a (click)="logout()" style="cursor: pointer;">Log Out</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h1>Admin Jobs</h1>
+        <p>Placeholder for admin jobs list page.</p>
+    </main>
+</div>
+
+<footer class="footer">
+    <p>© 2025 SkillMatch AI. All rights reserved.</p>
+    <p>
+        <a href="https://www.flaticon.com/free-icons/network" title="network icons">
+            Network icons created by Kiranshastry - Flaticon
+        </a>
+    </p>
+</footer>
