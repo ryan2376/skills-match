@@ -1,0 +1,75 @@
+<!-- src/app/components/Employer/Job-details/job-details.component.html -->
+<app-navbar></app-navbar>
+
+<!-- Main Content -->
+<div class="job-details-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>Employer Panel</h2>
+        <nav class="sidebar-nav">
+            <a routerLink="/employer/dashboard">Dashboard</a>
+            <a routerLink="/employer/post-job">Post Job</a>
+            <a routerLink="/employer/candidates">Candidates</a>
+            <a routerLink="/employer/matches">Matches</a>
+            <a routerLink="/employer/settings">Settings</a>
+        </nav>
+    </aside>
+
+    <!-- Job Details Content -->
+    <main class="main-content">
+        <h1>Job Details</h1>
+
+        <!-- Error Message -->
+        <p *ngIf="error" class="error-message">{{ error }}</p>
+
+        <!-- Job Details -->
+        <div *ngIf="job; else loading" class="job-details">
+            <mat-card class="job-card">
+                <mat-card-header>
+                    <mat-card-title>{{ job.title }}</mat-card-title>
+                    <mat-card-subtitle>{{ job.location }} | Status: {{ job.status }}</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                    <p class="description">{{ job.description }}</p>
+
+                    <!-- Skills -->
+                    <div class="skills-section">
+                        <h3>Skills</h3>
+                        <mat-chip-listbox>
+                            <mat-chip *ngFor="let skill of job.skills">{{ skill }}</mat-chip>
+                        </mat-chip-listbox>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="stats-section">
+                        <h3>Stats</h3>
+                        <p>Applications: {{ applications }}</p>
+                        <p>Matches: {{ matches }}</p>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions>
+                    <button mat-raised-button color="primary" [routerLink]="['/employer/edit-job', job.id]">
+                        Edit Job
+                    </button>
+                    <button mat-raised-button color="accent" [routerLink]="['/employer/dashboard']">
+                        Back to Dashboard
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+
+        <ng-template #loading>
+            <p>Loading job details...</p>
+        </ng-template>
+    </main>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>© 2025 SkillMatch AI. All rights reserved.</p>
+    <p>
+        <a href="https://www.flaticon.com/free-icons/network" title="network icons">
+            Network icons created by Kiranshastry - Flaticon
+        </a>
+    </p>
+</footer>
