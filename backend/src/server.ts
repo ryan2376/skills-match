@@ -20,7 +20,7 @@ dotenv.config();
 const app = express();
 
 // load all variables
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 80;
 
 
 
@@ -29,7 +29,7 @@ app.use(express.json()); // parses application/json
 app.use(cookieParser());
 app.use(
     cors({
-        origin: "http://localhost:4200",
+        origin: "http://localhost:4200", // Replace with your actual S3 bucket URL
         methods: "GET, POST, PUT, PATCH, DELETE",
         credentials: true,
     })

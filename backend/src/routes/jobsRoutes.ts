@@ -7,6 +7,7 @@ import {
     updateJob,
     deleteJob,
     getJobsByEmployer,
+    getRecommendedJobs,
 } from "../controllers/jobsController";
 import { protect } from "../middlewares/auth/protect";
 import { employerGuard, adminGuard } from "../middlewares/auth/roleMiddleWare";
@@ -30,5 +31,8 @@ router.delete("/:id", protect, deleteJob);
 
 // Get all jobs by a specific employer (Employer or Admin)
 router.get("/employer/:employerId", protect, getJobsByEmployer);
+
+// Get recommended jobs for the authenticated job seeker
+router.get("/recommended", protect, getRecommendedJobs);
 
 export default router;

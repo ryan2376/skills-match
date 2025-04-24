@@ -8,7 +8,7 @@ import { catchError, switchMap } from 'rxjs/operators';
     providedIn: 'root'
 })
 export class ApiService {
-    private apiUrl = 'http://localhost:3000/api/v1';
+    private apiUrl = 'http://localhost:80/api/v1';
     private token: string | null = null;
     private userId: string | null = null; // Add this to store user ID
     private refreshInProgress = false;
