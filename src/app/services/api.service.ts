@@ -113,6 +113,18 @@ export class ApiService {
         );
     }
 
+    getJobById(jobId: string): Observable<any> {
+        const request = this.http.get(`${this.apiUrl}/jobs/${jobId}`, { headers: this.getHeaders() });
+        return request.pipe(
+            catchError((err: HttpErrorResponse) => {
+                if (err.status === 401) {
+                    return this.handle401Error(request);
+                }
+                return throwError(() => err);
+            })
+        );
+    }
+
     getRecommendedJobs(): Observable<any> {
         const request = this.http.get(`${this.apiUrl}/jobs/recommended`, { headers: this.getHeaders() });
         return request.pipe(
@@ -163,6 +175,45 @@ export class ApiService {
 
     postJob(job: { title: string; description: string; location: string; skills: string[] }): Observable<any> {
         const request = this.http.post(`${this.apiUrl}/jobs`, job, { headers: this.getHeaders() });
+        return request.pipe(
+            catchError((err: HttpErrorResponse) => {
+                if (err.status === 401) {
+                    return this.handle401Error(request);
+                }
+                return throwError(() => err);
+            })
+        );
+    }
+
+    // New method: Fetch jobs by employer
+    getJobsByEmployer(employerId: string): Observable<any> {
+        const request = this.http.get(`${this.apiUrl}/jobs/employer/${employerId}`, { headers: this.getHeaders() });
+        return request.pipe(
+            catchError((err: HttpErrorResponse) => {
+                if (err.status === 401) {
+                    return this.handle401Error(request);
+                }
+                return throwError(() => err);
+            })
+        );
+    }
+
+    // New method: Fetch applications for a job
+    getApplicationsForJob(jobId: string): Observable<any> {
+        const request = this.http.get(`${this.apiUrl}/applications/job/${jobId}`, { headers: this.getHeaders() });
+        return request.pipe(
+            catchError((err: HttpErrorResponse) => {
+                if (err.status === 401) {
+                    return this.handle401Error(request);
+                }
+                return throwError(() => err);
+            })
+        );
+    }
+
+    // New method: Update a job (e.g., to close it)
+    updateJob(jobId: string, jobData: any): Observable<any> {
+        const request = this.http.put(`${this.apiUrl}/jobs/${jobId}`, jobData, { headers: this.getHeaders() });
         return request.pipe(
             catchError((err: HttpErrorResponse) => {
                 if (err.status === 401) {
