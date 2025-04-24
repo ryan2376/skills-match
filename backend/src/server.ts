@@ -13,6 +13,8 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import cvsRoutes from "./routes/cvsRoutes";
 import interviewsRoutes from "./routes/interviewsRoutes";
+import aiRoutes from "./routes/aiRoutes";
+
 dotenv.config();
 
 // instance of express
@@ -29,7 +31,7 @@ app.use(express.json()); // parses application/json
 app.use(cookieParser());
 app.use(
     cors({
-        origin: "http://localhost:4200", // Replace with your actual S3 bucket URL
+        origin: "http:http://my-skillmatch-project-2025.s3-website.eu-north-1.amazonaws.com", 
         methods: "GET, POST, PUT, PATCH, DELETE",
         credentials: true,
     })
@@ -41,6 +43,7 @@ app.use("/api/v1/jobs", jobsRoutes);
 app.use("/api/v1/applications", applicationsRoutes);
 app.use("/api/v1/cvs", cvsRoutes);
 app.use("/api/v1/interviews", interviewsRoutes);
+app.use("/api/v1/ai", aiRoutes);
 
 // load more middlewares - error handlers
 app.get("/test-db", async (req: express.Request, res: express.Response) => {
