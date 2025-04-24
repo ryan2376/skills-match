@@ -32,48 +32,56 @@ export const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'signup', component: SignupComponent },
     {
-        path: 'admin',
-        canActivate: [authGuard],
-        data: { role: 'admin' },
-        children: [
-            { path: 'dashboard', component: AdminDashComponent },
-            { path: 'users', component: AdminUsersComponent }, // New component for users list
-            { path: 'jobs', component: AdminJobsComponent }, // New component for jobs list
-            { path: 'settings', component: AdminSettingsComponent }, // New component for settings
-            { path: 'user/:id', component: UserDetailsComponent }, // New route for user details
-            { path: 'edit-user/:id', component: EditUserComponent }, // New route for editing user
-            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-        ],
-    },
-    {
-        path: 'employer',
-        canActivate: [authGuard],
-        data: { role: 'employer' },
-        children: [
-            { path: 'dashboard', component: EmployerDashComponent },
-            { path: 'post-job', component: PostAJobComponent },
-            { path: 'candidates', component: CandidatesComponent },
-            { path: 'matches', component: MatchesComponent },
-            { path: 'settings', component: SettingsComponent },
-            { path: 'job/:id', component: JobDetailsComponent },
-            { path: 'edit-job/:id', component: EditJobComponent },
-            { path: 'application/:applicationId', component: ApplicationDetailsComponent },
-            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-        ],
-    },
-    {
-        path: 'job-seeker',
-        canActivate: [authGuard],
-        data: { role: 'job_seeker' },
-        children: [
-            { path: 'dashboard', component: JobSeekerDashComponent },
-            { path: 'profile', component: JobSeekerProfileComponent },
-            { path: 'applications', component: JobSeekerApplicationsComponent },
-            { path: 'matches', component: JobSeekerMatchesComponent },
-            { path: 'saved-jobs', component: JobSeekerSavedJobsComponent },
-            { path: 'settings', component: JobSeekerSettingsComponent },
-            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-        ],
-    },
+        
+            path: 'admin',
+            canActivate: [authGuard],
+            data: { role: 'admin' },
+            children: [
+                { path: 'dashboard', component: AdminDashComponent },
+                { path: 'users', component: AdminUsersComponent },
+                { path: 'jobs', component: AdminJobsComponent },
+                { path: 'settings', component: AdminSettingsComponent },
+                {
+                    path: 'user/:id',
+                    component: UserDetailsComponent,
+                    data: { renderMode: 'ssr' }
+                },
+                {
+                    path: 'edit-user/:id',
+                    component: EditUserComponent,
+                    data: { renderMode: 'ssr' }
+                },
+                { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+            ],
+        },
+        {
+            path: 'employer',
+            canActivate: [authGuard],
+            data: { role: 'employer' },
+            children: [
+                { path: 'dashboard', component: EmployerDashComponent },
+                { path: 'post-job', component: PostAJobComponent },
+                { path: 'candidates', component: CandidatesComponent },
+                { path: 'matches', component: MatchesComponent },
+                { path: 'settings', component: SettingsComponent },
+                {
+                    path: 'job/:id',
+                    component: JobDetailsComponent,
+                    data: { renderMode: 'ssr' }
+                },
+                {
+                    path: 'edit-job/:id',
+                    component: EditJobComponent,
+                    data: { renderMode: 'ssr' }
+                },
+                {
+                    path: 'application/:applicationId',
+                    component: ApplicationDetailsComponent,
+                    data: { renderMode: 'ssr' }
+                },
+                { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+            ],
+        
+        },
     { path: '**', redirectTo: '' },
 ];
